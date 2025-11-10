@@ -41,7 +41,7 @@ A professional interview booking and recording platform built with Next.js 15, S
 ### 1. Clone and Install
 
 ```bash
-cd tell-me-more
+cd dearly
 npm install
 ```
 
@@ -136,7 +136,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Project Structure
 
 ```
-tell-me-more/
+dearly/
 ├── app/
 │   ├── actions/              # Server actions
 │   │   └── sessions.ts

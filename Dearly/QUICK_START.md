@@ -5,7 +5,7 @@
 ### Step 1: Install Dependencies (2 minutes)
 
 ```bash
-cd /Users/justincasler/Projects/TellMeMore/tell-me-more
+cd /Users/justincasler/Projects/DEARLY/dearly
 npm install
 ```
 

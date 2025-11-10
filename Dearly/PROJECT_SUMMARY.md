@@ -57,7 +57,7 @@ All core features have been implemented and are ready for testing and deployment
 ## File Structure
 
 ```
-tell-me-more/
+dearly/
 ├── app/
 │   ├── actions/
 │   │   └── sessions.ts              # Server actions for session management
