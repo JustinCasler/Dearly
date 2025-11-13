@@ -7,9 +7,63 @@ import { questionnaireSchema, QuestionnaireFormData } from '@/lib/validations'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+const THEME_QUESTIONS = {
+  'life-story': [
+    'Where and when were you born?',
+    'What do you remember most about your childhood home?',
+    'Who were the most important people in your early life?',
+    'What was school like for you growing up?',
+    'What was your first job, and how did you get it?',
+    'How did you meet your spouse/partner?',
+    'What were some of the biggest challenges you faced in life?',
+    'What accomplishments are you most proud of?',
+    'What lessons did you learn that you want to pass on?',
+    'How would you describe the person you\'ve become?',
+  ],
+  'life-advice': [
+    'What is the most important lesson life has taught you?',
+    'What advice would you give to your younger self?',
+    'What do you think is the key to a happy life?',
+    'How do you handle difficult times or setbacks?',
+    'What values have guided your decisions in life?',
+    'What do you wish you had known when you were younger?',
+    'What does success mean to you?',
+    'How do you define a life well-lived?',
+    'What would you want future generations to know?',
+    'What brings you the most joy and fulfillment?',
+  ],
+  'family-stories': [
+    'What stories did your parents tell you about their lives?',
+    'What family traditions were important growing up?',
+    'What do you remember about your grandparents?',
+    'Are there any family heirlooms or treasured possessions with stories?',
+    'What were holidays like in your family?',
+    'What are your favorite memories with your siblings?',
+    'What family recipes or foods are special to you?',
+    'How did your family celebrate important milestones?',
+    'What challenges did your family overcome together?',
+    'What do you hope your family remembers about you?',
+  ],
+  'hobbies-interests': [
+    'What hobbies or activities do you enjoy most?',
+    'How did you first become interested in your hobbies?',
+    'What skills have you developed over the years?',
+    'What books, movies, or music have been meaningful to you?',
+    'Have you traveled anywhere memorable? Tell me about it.',
+    'What creative pursuits have you explored?',
+    'Are there any sports or physical activities you enjoyed?',
+    'What organizations or groups have you been part of?',
+    'What would you still like to learn or experience?',
+    'How do you like to spend your free time?',
+  ],
+}
+
 export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedTheme, setSelectedTheme] = useState<string>('')
+  const [currentStep, setCurrentStep] = useState(1)
+  const [validationError, setValidationError] = useState<string | null>(null)
   const router = useRouter()
 
   const {
@@ -17,6 +71,7 @@ export default function CheckoutPage() {
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<QuestionnaireFormData>({
     resolver: zodResolver(questionnaireSchema),
@@ -31,12 +86,85 @@ export default function CheckoutPage() {
     },
   })
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: 'questions',
   })
 
+  const handleThemeChange = (theme: string) => {
+    setSelectedTheme(theme)
+    if (theme && THEME_QUESTIONS[theme as keyof typeof THEME_QUESTIONS]) {
+      const themeQuestions = THEME_QUESTIONS[theme as keyof typeof THEME_QUESTIONS]
+      const newQuestions = themeQuestions.map((text, index) => ({
+        id: `theme-${Date.now()}-${index}`,
+        text,
+      }))
+      replace(newQuestions)
+    } else if (theme === '') {
+      // Reset to empty questions when "Custom" is selected
+      replace([
+        { id: '1', text: '' },
+        { id: '2', text: '' },
+        { id: '3', text: '' },
+      ])
+    }
+  }
+
   const lengthMinutes = watch('length_minutes')
+
+  const handleNextStep = () => {
+    // Validate first page fields before proceeding
+    setValidationError(null)
+
+    const name = watch('name')
+    const email = watch('email')
+    const intervieweeName = watch('interviewee_name')
+    const relationship = watch('relationship_to_interviewee')
+    const lengthMinutes = watch('length_minutes')
+    const medium = watch('medium')
+
+    if (!name || name.trim() === '') {
+      setValidationError('Please enter your name')
+      return
+    }
+    if (!email || email.trim() === '') {
+      setValidationError('Please enter your email')
+      return
+    }
+    if (!intervieweeName || intervieweeName.trim() === '') {
+      setValidationError('Please enter the interviewee\'s name')
+      return
+    }
+    if (!relationship || relationship.trim() === '') {
+      setValidationError('Please enter your relationship to the interviewee')
+      return
+    }
+    if (!lengthMinutes) {
+      setValidationError('Please select a session length')
+      return
+    }
+    if (!medium) {
+      setValidationError('Please select an interview medium')
+      return
+    }
+
+    setCurrentStep(2)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handlePreviousStep = () => {
+    setValidationError(null)
+    setCurrentStep(1)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleBackButton = () => {
+    if (currentStep === 2) {
+      handlePreviousStep()
+    } else {
+      router.push('/')
+    }
+  }
 
   const onSubmit = async (data: QuestionnaireFormData) => {
     setIsSubmitting(true)
@@ -79,10 +207,10 @@ export default function CheckoutPage() {
 
   const getPrice = () => {
     switch (lengthMinutes) {
-      case 30: return '$150'
-      case 60: return '$250'
-      case 90: return '$350'
-      default: return '$250'
+      case 30: return '$99'
+      case 60: return '$139'
+      case 90: return '$199'
+      default: return '$139'
     }
   }
 
@@ -90,17 +218,44 @@ export default function CheckoutPage() {
     <div className="min-h-screen py-12" style={{ backgroundColor: '#F2EEE9' }}>
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="mb-8">
-          <Link href="/" className="hover:opacity-70 transition" style={{ color: '#1A0089' }}>
-            ← Back to Home
-          </Link>
+          <button
+            onClick={handleBackButton}
+            className="hover:opacity-70 transition"
+            style={{ color: '#1A0089' }}
+          >
+            ← {currentStep === 2 ? 'Back' : 'Back to Home'}
+          </button>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm p-8 md:p-12">
+          {/* Progress Indicator */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <span className={`text-sm font-medium ${currentStep >= 1 ? '' : 'opacity-50'}`} style={{ color: '#1A0089' }}>
+                1. Background Info
+              </span>
+              <span className={`text-sm font-medium ${currentStep >= 2 ? '' : 'opacity-50'}`} style={{ color: '#1A0089' }}>
+                2. Interview Questions
+              </span>
+            </div>
+            <div className="w-full h-2 rounded-full" style={{ backgroundColor: 'rgba(26, 0, 137, 0.1)' }}>
+              <div
+                className="h-2 rounded-full transition-all duration-500"
+                style={{
+                  backgroundColor: '#1A0089',
+                  width: currentStep === 1 ? '50%' : '100%'
+                }}
+              />
+            </div>
+          </div>
+
           <h1 className="text-4xl md:text-5xl font-bold font-serif mb-3" style={{ color: '#1A0089' }}>
-            Book Your Interview
+            {currentStep === 1 ? 'Book Your Interview' : 'Interview Questions'}
           </h1>
           <p className="text-lg mb-8 opacity-70" style={{ color: '#1A0089' }}>
-            Tell us about the interview you&apos;d like to schedule and provide questions for our interviewer.
+            {currentStep === 1
+              ? 'Tell us about the interview you\'d like to schedule.'
+              : 'Choose a theme or create custom questions for the interview.'}
           </p>
 
           {error && (
@@ -110,6 +265,9 @@ export default function CheckoutPage() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {/* Step 1: Background Information */}
+            {currentStep === 1 && (
+              <>
             {/* Your Information */}
             <div>
               <h2 className="text-2xl font-bold font-serif mb-4" style={{ color: '#1A0089' }}>Your Information</h2>
@@ -195,9 +353,9 @@ export default function CheckoutPage() {
                     className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
                     style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                   >
-                    <option value={30}>30 minutes - $150</option>
-                    <option value={60}>60 minutes - $250</option>
-                    <option value={90}>90 minutes - $350</option>
+                    <option value={30}>30 minutes - $99</option>
+                    <option value={60}>60 minutes - $139</option>
+                    <option value={90}>90 minutes - $199</option>
                   </select>
                   {errors.length_minutes && (
                     <p className="mt-1 text-sm" style={{ color: '#FF5E33' }}>{errors.length_minutes.message}</p>
@@ -224,13 +382,137 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Questions */}
+            {/* Validation Error for Step 1 */}
+            {validationError && (
+              <div className="text-sm text-red-700 text-center py-2">
+                {validationError}
+              </div>
+            )}
+
+            {/* Next Button for Step 1 */}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handleNextStep}
+                className="px-8 py-4 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 text-lg"
+                style={{ backgroundColor: '#1A0089' }}
+              >
+                Continue to Questions →
+              </button>
+            </div>
+            </>
+            )}
+
+            {/* Step 2: Questions */}
+            {currentStep === 2 && (
+              <>
             <div>
               <h2 className="text-2xl font-bold font-serif mb-2" style={{ color: '#1A0089' }}>Interview Questions</h2>
               <p className="text-sm mb-4 opacity-70" style={{ color: '#1A0089' }}>
-                Provide 3-20 questions you&apos;d like our interviewer to ask. These will guide the conversation.
+                Choose a theme to get pre-populated questions, or create your own custom questions.
               </p>
-              
+
+              {/* Theme Selector */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-3" style={{ color: '#1A0089' }}>
+                  Select Interview Theme
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange('life-story')}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg ${
+                      selectedTheme === 'life-story' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
+                    }`}
+                    style={{
+                      borderColor: '#1A0089',
+                      backgroundColor: selectedTheme === 'life-story' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
+                    }}
+                  >
+                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Life Story</div>
+                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                      Comprehensive questions about their life journey
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange('life-advice')}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg ${
+                      selectedTheme === 'life-advice' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
+                    }`}
+                    style={{
+                      borderColor: '#1A0089',
+                      backgroundColor: selectedTheme === 'life-advice' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
+                    }}
+                  >
+                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Life Advice</div>
+                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                      Wisdom, lessons learned, and guidance for future generations
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange('family-stories')}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg ${
+                      selectedTheme === 'family-stories' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
+                    }`}
+                    style={{
+                      borderColor: '#1A0089',
+                      backgroundColor: selectedTheme === 'family-stories' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
+                    }}
+                  >
+                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Family Stories</div>
+                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                      Family history, traditions, and memorable moments
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange('hobbies-interests')}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg ${
+                      selectedTheme === 'hobbies-interests' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
+                    }`}
+                    style={{
+                      borderColor: '#1A0089',
+                      backgroundColor: selectedTheme === 'hobbies-interests' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
+                    }}
+                  >
+                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Hobbies & Interests</div>
+                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                      Passions, skills, and meaningful experiences
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange('')}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg md:col-span-2 ${
+                      selectedTheme === '' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
+                    }`}
+                    style={{
+                      borderColor: '#1A0089',
+                      backgroundColor: selectedTheme === '' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
+                    }}
+                  >
+                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Custom Questions</div>
+                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                      Create your own personalized questions
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {selectedTheme && (
+                <div className="mb-4 p-4 rounded-2xl" style={{ backgroundColor: 'rgba(183, 207, 63, 0.15)' }}>
+                  <p className="text-sm font-medium" style={{ color: '#1A0089' }}>
+                    ✓ 10 questions loaded. Feel free to edit or add more below!
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-3">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex gap-2">
@@ -303,15 +585,17 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Submit */}
+            {/* Submit Button for Step 2 */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full text-white py-4 rounded-full font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+              className="w-full text-white py-4 rounded-full font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
               style={{ backgroundColor: '#1A0089' }}
             >
               {isSubmitting ? 'Processing...' : 'Proceed to Payment'}
             </button>
+            </>
+            )}
           </form>
         </div>
       </div>
