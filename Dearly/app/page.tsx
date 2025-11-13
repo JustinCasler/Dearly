@@ -152,7 +152,7 @@ export default function HomePage() {
           <div className="order-1 md:order-2 relative">
             <div className="relative w-full h-[500px] rounded-3xl overflow-hidden shadow-xl">
               <Image
-                src="/section2.png"
+                src="/section2.jpeg"
                 alt="Professional interview"
                 fill
                 className="object-cover"
