@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import { Database } from '@/types/database'
 
 function getSupabaseClient() {
@@ -13,17 +13,13 @@ function getSupabaseClient() {
     throw new Error('Missing Supabase environment variables. Please check your .env.local file.')
   }
 
-  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-      storageKey: 'supabase.auth.token',
-      flowType: 'pkce'
-    }
-  })
+  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
 }
 
 export const supabase = getSupabaseClient()
+
+// Also export a function to create a new client instance
+export function createClient() {
+  return getSupabaseClient()
+}
 

@@ -5,8 +5,16 @@ import { useParams, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { recordingUploadSchema, RecordingUploadFormData } from '@/lib/validations'
-import { getSessionDetails, updateSessionStatus, uploadRecording } from '@/app/actions/sessions'
+import {
+  getSessionDetails,
+  updateSessionStatus,
+  uploadRecording,
+  getSessionWithInterviewer,
+  unassignSession,
+  SessionWithDetails
+} from '@/app/actions/sessions'
 import Link from 'next/link'
+import AssignmentBadge from '@/components/AssignmentBadge'
 
 type SessionDetails = {
   session: {
@@ -14,7 +22,9 @@ type SessionDetails = {
     status: string
     amount: number
     recording_url: string | null
-    calendly_event_id: string | null
+    appointment_id: string | null
+    appointment_start_time: string | null
+    appointment_end_time: string | null
     created_at: string
     users: {
       name: string
@@ -38,8 +48,10 @@ export default function SessionDetailPage() {
   const sessionId = params.id as string
 
   const [details, setDetails] = useState<SessionDetails | null>(null)
+  const [sessionWithInterviewer, setSessionWithInterviewer] = useState<SessionWithDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [unassigning, setUnassigning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
@@ -63,6 +75,13 @@ export default function SessionDetailPage() {
     } else {
       setError('Failed to load session details')
     }
+
+    // Also load session with interviewer info
+    const sessionData = await getSessionWithInterviewer(sessionId)
+    if (sessionData) {
+      setSessionWithInterviewer(sessionData)
+    }
+
     setLoading(false)
   }
 
@@ -77,20 +96,42 @@ export default function SessionDetailPage() {
     }
   }
 
+  const handleUnassign = async () => {
+    if (!confirm('Are you sure you want to unassign this interviewer?')) {
+      return
+    }
+
+    setUnassigning(true)
+    setError(null)
+    setSuccess(null)
+
+    const result = await unassignSession(sessionId)
+
+    if (result.success) {
+      setSuccess('Interviewer unassigned successfully')
+      loadSessionDetails()
+      setTimeout(() => setSuccess(null), 3000)
+    } else {
+      setError(result.error || 'Failed to unassign interviewer')
+    }
+
+    setUnassigning(false)
+  }
+
   const onSubmitRecording = async (data: RecordingUploadFormData) => {
     setUploading(true)
     setError(null)
     setSuccess(null)
 
     const result = await uploadRecording(sessionId, data.recording_url)
-    
+
     if (result.success) {
       setSuccess('Recording uploaded and email sent successfully!')
       loadSessionDetails()
     } else {
       setError(result.error || 'Failed to upload recording')
     }
-    
+
     setUploading(false)
   }
 
@@ -272,6 +313,38 @@ export default function SessionDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Interviewer Assignment */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="font-semibold mb-3">Interviewer Assignment</h3>
+            {sessionWithInterviewer?.interviewer ? (
+              <div className="space-y-3">
+                <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                  <p className="text-sm text-gray-600 mb-1">Assigned to</p>
+                  <p className="font-semibold text-gray-900">
+                    {sessionWithInterviewer.interviewer.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {sessionWithInterviewer.interviewer.email}
+                  </p>
+                </div>
+                <button
+                  onClick={handleUnassign}
+                  disabled={unassigning}
+                  className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {unassigning ? 'Unassigning...' : 'Unassign Interviewer'}
+                </button>
+              </div>
+            ) : (
+              <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <AssignmentBadge interviewer={null} />
+                <p className="text-xs text-gray-600 mt-2">
+                  This session is waiting to be claimed by an interviewer
+                </p>
+              </div>
+            )}
+          </div>
+
           {/* Status */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="font-semibold mb-3">Status</h3>
@@ -292,13 +365,34 @@ export default function SessionDetailPage() {
             </div>
           </div>
 
-          {/* Calendly Info */}
-          {session.calendly_event_id && (
+          {/* Appointment Info */}
+          {session.appointment_start_time && (
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="font-semibold mb-3">Calendly Event</h3>
-              <p className="text-sm text-gray-600 break-all">
-                {session.calendly_event_id}
-              </p>
+              <h3 className="font-semibold mb-3">Scheduled Appointment</h3>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">
+                  <strong>Start:</strong> {new Date(session.appointment_start_time).toLocaleString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    timeZone: 'America/New_York'
+                  })} EST
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>End:</strong> {new Date(session.appointment_end_time!).toLocaleString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    timeZone: 'America/New_York'
+                  })} EST
+                </p>
+              </div>
             </div>
           )}
         </div>

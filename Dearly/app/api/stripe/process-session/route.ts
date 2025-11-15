@@ -13,11 +13,18 @@ import Stripe from 'stripe'
  */
 export async function POST(req: NextRequest) {
   try {
-    const { sessionId } = await req.json()
+    const { sessionId, questionnaireEncoded } = await req.json()
 
     if (!sessionId) {
       return NextResponse.json(
         { error: 'sessionId is required' },
+        { status: 400 }
+      )
+    }
+
+    if (!questionnaireEncoded) {
+      return NextResponse.json(
+        { error: 'questionnaireEncoded is required' },
         { status: 400 }
       )
     }
@@ -75,7 +82,11 @@ export async function POST(req: NextRequest) {
     const customerName = metadata.customer_name
     const customerEmail = metadata.customer_email
     const lengthMinutes = parseInt(metadata.length_minutes)
-    const questionnaire = JSON.parse(metadata.questionnaire)
+
+    // Decode questionnaire from URL parameter
+    const questionnaire = JSON.parse(
+      Buffer.from(questionnaireEncoded, 'base64url').toString('utf-8')
+    )
 
     // Create or get user
     let { data: existingUser } = await supabaseAdmin
@@ -149,19 +160,31 @@ export async function POST(req: NextRequest) {
       notes: questionnaire.notes || null,
     } as any)
 
-    // Send confirmation email with Calendly link
-    const calendlyLink = process.env.NEXT_PUBLIC_CALENDLY_LINK
-    
+    // Send confirmation email with booking link
+    const bookingLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/booking/${(sessionRecord as any).id}`
+
     if (!process.env.RESEND_API_KEY) {
       console.error('RESEND_API_KEY is not configured! Email will not be sent.')
     }
-    
+
+    const bookingEmail = `
+      <h1>Thank You for Your Purchase!</h1>
+      <p>Hi ${customerName},</p>
+      <p>Thank you for choosing Dearly to create a meaningful keepsake. Your payment has been received successfully.</p>
+      <h2>Next Step: Schedule Your Interview</h2>
+      <p>Please click the link below to select a time that works best for you:</p>
+      <p><a href="${bookingLink}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Schedule Your Interview</a></p>
+      <p>Or copy this link: ${bookingLink}</p>
+      <p>We look forward to helping you preserve precious memories.</p>
+      <p>Best,<br/>The Dearly Team</p>
+    `
+
     const emailResult = await sendEmail({
       to: customerEmail,
       subject: 'Thank you for your purchase - Schedule your interview',
-      html: getPaymentSuccessEmail(customerName, calendlyLink || 'https://calendly.com'),
+      html: bookingEmail,
     })
-    
+
     if (!emailResult.success) {
       console.error('Failed to send email to:', customerEmail, emailResult.error)
     }

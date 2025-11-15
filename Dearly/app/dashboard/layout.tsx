@@ -1,50 +1,36 @@
-'use client'
+import { createServerClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import DashboardNav from '@/components/DashboardNav'
 
-import { useRouter } from 'next/navigation'
-import { signOut } from '@/lib/auth'
-import Link from 'next/link'
-
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const router = useRouter()
+  const supabase = await createServerClient()
 
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-      router.push('/login')
-    } catch (error) {
-      console.error('Error signing out:', error)
-    }
+  // Get current user
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    redirect('/login')
   }
+
+  // Get user role
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('role, name')
+    .eq('id', user.id)
+    .single<{ role: 'customer' | 'interviewer' | 'admin'; name: string }>()
+
+  if (userError || !userData) {
+    redirect('/login')
+  }
+
+  const userRole = userData.role
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <Link href="/dashboard" className="text-xl font-bold text-indigo-600">
-                Dearly
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-gray-700 hover:text-indigo-600 transition"
-              >
-                Sessions
-              </Link>
-            </div>
-            <button
-              onClick={handleSignOut}
-              className="text-gray-700 hover:text-indigo-600 transition"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </nav>
+      <DashboardNav userRole={userRole} userName={userData.name} />
       <main className="container mx-auto px-4 py-8">
         {children}
       </main>

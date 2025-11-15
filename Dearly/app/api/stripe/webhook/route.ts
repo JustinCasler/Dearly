@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import { sendEmail, getPaymentSuccessEmail } from '@/lib/resend'
 import Stripe from 'stripe'
 
 export async function POST(req: NextRequest) {
@@ -51,7 +50,31 @@ export async function POST(req: NextRequest) {
         const customerName = metadata.customer_name
         const customerEmail = metadata.customer_email
         const lengthMinutes = parseInt(metadata.length_minutes)
-        const questionnaire = JSON.parse(metadata.questionnaire)
+
+        // Parse questionnaire - handle both old format and new compressed format
+        let questionnaire
+        if (metadata.questionnaire) {
+          const parsed = JSON.parse(metadata.questionnaire)
+          // Check if it's compressed format (has 'r', 'i', 'q' keys)
+          if ('r' in parsed && 'i' in parsed && 'q' in parsed) {
+            // Decompress
+            questionnaire = {
+              relationship_to_interviewee: parsed.r,
+              interviewee_name: parsed.i,
+              questions: parsed.q.map((text: string, index: number) => ({
+                id: `q-${index}`,
+                text
+              })),
+              medium: parsed.m,
+              notes: parsed.n
+            }
+          } else {
+            // Old format, use as-is
+            questionnaire = parsed
+          }
+        } else {
+          throw new Error('No questionnaire data in metadata')
+        }
 
         // Create or get user
         let { data: existingUser } = await supabaseAdmin
@@ -120,23 +143,9 @@ export async function POST(req: NextRequest) {
           notes: questionnaire.notes || null,
         } as any)
 
-        // Send confirmation email with Calendly link
-        const calendlyLink = process.env.NEXT_PUBLIC_CALENDLY_LINK!
-        
-        // Check if Resend is configured
-        if (!process.env.RESEND_API_KEY) {
-          console.error('RESEND_API_KEY is not configured! Email will not be sent.')
-        }
-        
-        const emailResult = await sendEmail({
-          to: customerEmail,
-          subject: 'Thank you for your purchase - Schedule your interview',
-          html: getPaymentSuccessEmail(customerName, calendlyLink),
-        })
-        
-        if (!emailResult.success) {
-          console.error('Failed to send email to:', customerEmail, emailResult.error)
-        }
+        // Payment successful - user will receive email after booking their appointment
+        console.log('Payment processed successfully for:', customerEmail)
+        console.log('Booking link:', `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/booking/${(sessionRecord as any).id}`)
       } catch (error) {
         console.error('Error processing checkout session:', error)
         return NextResponse.json(

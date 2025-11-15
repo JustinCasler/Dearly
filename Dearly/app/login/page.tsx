@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, LoginFormData } from '@/lib/validations'
@@ -12,6 +12,7 @@ import Link from 'next/link'
 export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [checking, setChecking] = useState(true)
   const router = useRouter()
 
   const {
@@ -22,37 +23,84 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   })
 
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (session) {
+          console.log('User already logged in, redirecting to dashboard...')
+          window.location.href = '/dashboard'
+          return
+        }
+      } catch (err) {
+        console.error('Error checking session:', err)
+      } finally {
+        setChecking(false)
+      }
+    }
+
+    checkExistingSession()
+  }, [])
+
   const onSubmit = async (data: LoginFormData) => {
+    console.log('Login attempt started for:', data.email)
     setIsSubmitting(true)
     setError(null)
 
     try {
+      console.log('Calling signIn...')
       const result = await signIn(data.email, data.password)
-      
+      console.log('signIn result:', result ? 'success' : 'null')
+
       if (!result || !result.session) {
+        console.error('No session in result')
         throw new Error('Login failed: No session created')
       }
-      
+
+      console.log('Session created, verifying...')
       // Verify the session is actually set by checking again
-      const { data: { session: verifySession } } = await supabase.auth.getSession()
-      
+      const { data: { session: verifySession }, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError) {
+        console.error('Session verification error:', sessionError)
+        throw new Error('Session verification failed: ' + sessionError.message)
+      }
+
       if (!verifySession) {
+        console.error('Session was not properly set')
         throw new Error('Session was not properly set. Please try again.')
       }
-      
+
+      console.log('Session verified, redirecting to dashboard...')
+
       // Small delay to ensure session is written to localStorage
       await new Promise(resolve => setTimeout(resolve, 200))
-      
+
       // Use window.location for more reliable navigation
       // This ensures a full page load and proper session initialization
       window.location.href = '/dashboard'
-      
+
     } catch (err: any) {
-      console.error('Login error:', err)
+      console.error('Login error caught:', err)
       const errorMessage = err?.message || err?.error?.message || 'Invalid email or password. Please check your credentials and try again.'
+      console.error('Error message to display:', errorMessage)
       setError(errorMessage)
       setIsSubmitting(false)
     }
+  }
+
+  // Show loading while checking for existing session
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

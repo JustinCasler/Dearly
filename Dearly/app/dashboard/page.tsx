@@ -1,51 +1,27 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getSessions } from '@/app/actions/sessions'
+import { getAllSessionsWithInterviewers, SessionWithDetails } from '@/app/actions/sessions'
 import Link from 'next/link'
-
-type Session = {
-  id: string
-  status: string
-  amount: number
-  created_at: string
-  users: {
-    name: string
-    email: string
-  }
-  questionnaires: Array<{
-    interviewee_name: string
-    length_minutes: number
-    medium: string
-  }>
-}
+import AssignmentBadge from '@/components/AssignmentBadge'
 
 export default function DashboardPage() {
-  const [sessions, setSessions] = useState<Session[]>([])
+  const [sessions, setSessions] = useState<SessionWithDetails[]>([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('all')
+  const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'assigned' | 'unassigned'>('all')
 
   useEffect(() => {
-    // Check authentication on mount
-    checkAuth()
     loadSessions()
-  }, [statusFilter])
-
-  const checkAuth = async () => {
-    const { supabase } = await import('@/lib/supabase/client')
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (!session) {
-      window.location.href = '/login'
-      return
-    }
-  }
+  }, [])
 
   const loadSessions = async () => {
     setLoading(true)
-    const result = await getSessions(statusFilter)
-    if (result.success && result.data) {
-      setSessions(result.data as Session[])
+    try {
+      const data = await getAllSessionsWithInterviewers()
+      setSessions(data)
+    } catch (error) {
+      // Error handled silently
     }
     setLoading(false)
   }
@@ -72,6 +48,22 @@ export default function DashboardPage() {
     return `$${(amount / 100).toFixed(2)}`
   }
 
+  // Filter sessions
+  const filteredSessions = sessions.filter(session => {
+    // Status filter
+    if (statusFilter !== 'all' && session.status !== statusFilter) {
+      return false
+    }
+    // Assignment filter
+    if (assignmentFilter === 'assigned' && !session.interviewer_id) {
+      return false
+    }
+    if (assignmentFilter === 'unassigned' && session.interviewer_id) {
+      return false
+    }
+    return true
+  })
+
   return (
     <div>
       <div className="mb-8">
@@ -80,20 +72,47 @@ export default function DashboardPage() {
       </div>
 
       {/* Filters */}
-      <div className="mb-6 flex gap-2">
-        {['all', 'paid', 'scheduled', 'completed', 'delivered'].map((filter) => (
-          <button
-            key={filter}
-            onClick={() => setStatusFilter(filter)}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
-              statusFilter === filter
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            {filter.charAt(0).toUpperCase() + filter.slice(1)}
-          </button>
-        ))}
+      <div className="mb-6 space-y-4">
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-2">Status</p>
+          <div className="flex gap-2">
+            {['all', 'paid', 'scheduled', 'completed', 'delivered'].map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setStatusFilter(filter)}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  statusFilter === filter
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                }`}
+              >
+                {filter.charAt(0).toUpperCase() + filter.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-2">Assignment</p>
+          <div className="flex gap-2">
+            {[
+              { value: 'all', label: 'All Sessions' },
+              { value: 'assigned', label: 'Assigned' },
+              { value: 'unassigned', label: 'Unassigned' }
+            ].map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => setAssignmentFilter(filter.value as any)}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  assignmentFilter === filter.value
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Sessions List */}
@@ -101,7 +120,7 @@ export default function DashboardPage() {
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
-      ) : sessions.length === 0 ? (
+      ) : filteredSessions.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-12 text-center">
           <p className="text-gray-600">No sessions found</p>
         </div>
@@ -115,6 +134,9 @@ export default function DashboardPage() {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Interviewee
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Interviewer
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Length
@@ -134,19 +156,22 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {sessions.map((session) => (
+              {filteredSessions.map((session) => (
                 <tr key={session.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="font-medium text-gray-900">{session.users.name}</div>
-                      <div className="text-sm text-gray-500">{session.users.email}</div>
+                      <div className="font-medium text-gray-900">{session.user?.name || 'Unknown'}</div>
+                      <div className="text-sm text-gray-500">{session.user?.email || 'N/A'}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {session.questionnaires[0]?.interviewee_name || 'N/A'}
+                    {session.questionnaire?.interviewee_name || 'N/A'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <AssignmentBadge interviewer={session.interviewer} variant="compact" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {session.questionnaires[0]?.length_minutes || 'N/A'} min
+                    {session.questionnaire?.length_minutes || 'N/A'} min
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {formatAmount(session.amount)}

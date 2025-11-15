@@ -4,11 +4,11 @@ import { stripe, getPriceForLength } from '@/lib/stripe'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { 
-      name, 
-      email, 
+    const {
+      name,
+      email,
       length_minutes,
-      questionnaire 
+      questionnaire
     } = body
 
     if (!name || !email || !length_minutes || !questionnaire) {
@@ -19,6 +19,9 @@ export async function POST(req: NextRequest) {
     }
 
     const amount = getPriceForLength(length_minutes as 30 | 60 | 90)
+
+    // Encode the full questionnaire as base64 to pass in URL
+    const questionnaireEncoded = Buffer.from(JSON.stringify(questionnaire)).toString('base64url')
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -37,14 +40,14 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}&q=${questionnaireEncoded}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
       customer_email: email,
       metadata: {
         customer_name: name,
         customer_email: email,
         length_minutes: length_minutes.toString(),
-        questionnaire: JSON.stringify(questionnaire),
+        interviewee_name: questionnaire.interviewee_name,
       },
     })
 

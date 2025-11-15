@@ -7,9 +7,10 @@ import { useSearchParams } from 'next/navigation'
 function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
+  const questionnaireEncoded = searchParams.get('q')
   const [processing, setProcessing] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [processed, setProcessed] = useState(false)
+  const [bookingSessionId, setBookingSessionId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!sessionId) {
@@ -18,13 +19,22 @@ function SuccessContent() {
       return
     }
 
-    // Process the session
+    if (!questionnaireEncoded) {
+      setError('No questionnaire data found')
+      setProcessing(false)
+      return
+    }
+
+    // Process the session and redirect to booking
     const processSession = async () => {
       try {
         const response = await fetch('/api/stripe/process-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId }),
+          body: JSON.stringify({
+            sessionId,
+            questionnaireEncoded
+          }),
         })
 
         const result = await response.json()
@@ -33,8 +43,11 @@ function SuccessContent() {
           throw new Error(result.error || 'Failed to process session')
         }
 
-        setProcessed(true)
-        setProcessing(false)
+        // Redirect to booking page after a brief delay
+        setBookingSessionId(result.sessionId)
+        setTimeout(() => {
+          window.location.href = `/booking/${result.sessionId}`
+        }, 2000)
       } catch (err: any) {
         console.error('Error processing session:', err)
         setError(err.message || 'Failed to process payment. Please contact support.')
@@ -43,7 +56,7 @@ function SuccessContent() {
     }
 
     processSession()
-  }, [sessionId])
+  }, [sessionId, questionnaireEncoded])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center px-4">
@@ -72,14 +85,19 @@ function SuccessContent() {
           </p>
         </div>
 
-        {processing && (
+        {processing && !error && (
           <div className="bg-blue-50 rounded-lg p-6 mb-8">
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-3 mb-4">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
               <p className="text-blue-700 font-medium">
                 Processing your payment...
               </p>
             </div>
+            {bookingSessionId && (
+              <p className="text-blue-600 text-sm">
+                Redirecting you to schedule your interview...
+              </p>
+            )}
           </div>
         )}
 
@@ -99,59 +117,42 @@ function SuccessContent() {
           </div>
         )}
 
-        {processed && !error && (
-          <div className="bg-green-50 rounded-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold text-green-900 mb-2">
-              ✅ All Set!
-            </h2>
-            <p className="text-green-700 mb-4">
-              Your payment has been processed and you should receive an email shortly with your scheduling link.
-            </p>
+        {!error && (
+          <div className="bg-indigo-50 rounded-lg p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-3">What&apos;s Next?</h2>
+            <div className="text-left space-y-3">
+              <div className="flex gap-3">
+                <span className="text-indigo-600 font-bold">1.</span>
+                <p className="text-gray-700">
+                  Select a time that works for you from our available slots
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-indigo-600 font-bold">2.</span>
+                <p className="text-gray-700">
+                  You&apos;ll receive a confirmation email with all the details
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-indigo-600 font-bold">3.</span>
+                <p className="text-gray-700">
+                  We&apos;ll send you the final recording within 5-7 business days after the interview
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
-        <div className="bg-indigo-50 rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-3">What&apos;s Next?</h2>
-          <div className="text-left space-y-3">
-            <div className="flex gap-3">
-              <span className="text-indigo-600 font-bold">1.</span>
-              <p className="text-gray-700">
-                Check your email for a confirmation and scheduling link
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <span className="text-indigo-600 font-bold">2.</span>
-              <p className="text-gray-700">
-                Use the Calendly link to book a time that works for you
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <span className="text-indigo-600 font-bold">3.</span>
-              <p className="text-gray-700">
-                We&apos;ll send you the final recording within 5-7 business days after the interview
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <p className="text-gray-600">
-            If you have any questions, please contact us at{' '}
-            <a
-              href="mailto:team@dearly.com"
-              className="text-indigo-600 hover:text-indigo-700 font-medium"
+        {error && (
+          <div className="space-y-4">
+            <Link
+              href="/"
+              className="inline-block bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
             >
-              team@dearly.com
-            </a>
-          </p>
-          
-          <Link
-            href="/"
-            className="inline-block bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
-          >
-            Return to Home
-          </Link>
-        </div>
+              Return to Home
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )
