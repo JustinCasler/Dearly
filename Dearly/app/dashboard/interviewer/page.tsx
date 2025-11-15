@@ -17,7 +17,7 @@ export default async function InterviewerDashboard() {
     .from('users')
     .select('role')
     .eq('id', user.id)
-    .single()
+    .single() as { data: { role: string } | null, error: any }
 
   if (userError || !userData || (userData.role !== 'interviewer' && userData.role !== 'admin')) {
     redirect('/dashboard')
