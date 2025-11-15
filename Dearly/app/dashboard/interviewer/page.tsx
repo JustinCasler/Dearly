@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createServerClient, supabaseAdmin } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getAssignedSessions } from '@/app/actions/sessions'
 import SessionCard from '@/components/SessionCard'
@@ -12,12 +12,12 @@ export default async function InterviewerDashboard() {
     redirect('/login')
   }
 
-  // Verify user is interviewer or admin
-  const { data: userData, error: userError } = await supabase
+  // Verify user is interviewer or admin (using admin client to bypass RLS)
+  const { data: userData, error: userError } = await supabaseAdmin
     .from('users')
     .select('role')
     .eq('id', user.id)
-    .single<{ role: 'customer' | 'interviewer' | 'admin' }>()
+    .single()
 
   if (userError || !userData || (userData.role !== 'interviewer' && userData.role !== 'admin')) {
     redirect('/dashboard')

@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createServerClient, supabaseAdmin } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import DashboardNav from '@/components/DashboardNav'
 
@@ -15,18 +15,19 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  // Get user role
-  const { data: userData, error: userError } = await supabase
+  // Get user role using admin client to bypass RLS
+  // (RLS policies on users table create circular dependency)
+  const { data: userData, error: userError } = await supabaseAdmin
     .from('users')
     .select('role, name')
     .eq('id', user.id)
-    .single<{ role: 'customer' | 'interviewer' | 'admin'; name: string }>()
+    .single()
 
   if (userError || !userData) {
     redirect('/login')
   }
 
-  const userRole = userData.role
+  const userRole = userData.role as 'customer' | 'interviewer' | 'admin'
 
   return (
     <div className="min-h-screen bg-gray-50">

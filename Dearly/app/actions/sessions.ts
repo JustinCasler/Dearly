@@ -152,9 +152,8 @@ export async function getSessionDetails(sessionId: string) {
  * Available for interviewers to claim
  */
 export async function getUnassignedSessions(): Promise<SessionWithDetails[]> {
-  const supabase = await createServerClient()
-
-  const { data, error } = await supabase
+  // Use admin client to bypass RLS for fetching unassigned sessions
+  const { data, error } = await supabaseAdmin
     .from('sessions')
     .select(`
       *,
@@ -186,9 +185,8 @@ export async function getUnassignedSessions(): Promise<SessionWithDetails[]> {
  * Get sessions assigned to a specific interviewer
  */
 export async function getAssignedSessions(interviewerId: string): Promise<SessionWithDetails[]> {
-  const supabase = await createServerClient()
-
-  const { data, error } = await supabase
+  // Use admin client to bypass RLS for fetching assigned sessions
+  const { data, error } = await supabaseAdmin
     .from('sessions')
     .select(`
       *,
@@ -219,9 +217,8 @@ export async function getAssignedSessions(interviewerId: string): Promise<Sessio
  * Get all sessions with interviewer info (admin view)
  */
 export async function getAllSessionsWithInterviewers(): Promise<SessionWithDetails[]> {
-  const supabase = await createServerClient()
-
-  const { data, error } = await supabase
+  // Use admin client to bypass RLS for fetching all sessions
+  const { data, error } = await supabaseAdmin
     .from('sessions')
     .select(`
       *,
@@ -232,8 +229,11 @@ export async function getAllSessionsWithInterviewers(): Promise<SessionWithDetai
     .order('created_at', { ascending: false })
 
   if (error) {
-    throw new Error('Failed to fetch sessions')
+    console.error('[getAllSessionsWithInterviewers] Error:', error)
+    throw new Error(`Failed to fetch sessions: ${error.message}`)
   }
+
+  console.log('[getAllSessionsWithInterviewers] Success, fetched', data?.length, 'sessions')
 
   return data.map((session: any) => ({
     ...session,
@@ -367,9 +367,8 @@ export async function unassignSession(sessionId: string): Promise<{ success: boo
  * Get a single session with full details including interviewer
  */
 export async function getSessionWithInterviewer(sessionId: string): Promise<SessionWithDetails | null> {
-  const supabase = await createServerClient()
-
-  const { data, error } = await supabase
+  // Use admin client to bypass RLS
+  const { data, error } = await supabaseAdmin
     .from('sessions')
     .select(`
       *,
