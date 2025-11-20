@@ -127,12 +127,12 @@ export async function getSessionDetails(sessionId: string) {
       .eq('id', sessionId)
       .single()
 
-    if (sessionError) {
+    if (sessionError || !session) {
       console.error('[getSessionDetails] Session error:', sessionError)
-      throw sessionError
+      throw sessionError || new Error('Session not found')
     }
 
-    console.log('[getSessionDetails] Session found:', session?.id)
+    console.log('[getSessionDetails] Session found')
 
     const { data: questionnaire, error: questionnaireError } = await supabaseAdmin
       .from('questionnaires')
