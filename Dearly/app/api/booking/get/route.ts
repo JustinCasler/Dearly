@@ -19,16 +19,33 @@ export async function GET(request: NextRequest) {
 
     const { data: appointment, error: appointmentError } = await supabase
       .from('appointments')
-      .select('*, sessions!appointments_session_id_fkey(*), users(*), availability_slots(*)')
+      .select(`
+        *,
+        sessions!appointments_session_id_fkey(*),
+        users!appointments_user_id_fkey(*),
+        availability_slots(*)
+      `)
       .eq('booking_token', booking_token)
       .single()
 
     console.log('Appointment query result:', { appointment, error: appointmentError })
 
     if (appointmentError || !appointment) {
-      console.error('Error fetching appointment:', appointmentError)
+      console.error('Error fetching appointment:', {
+        error: appointmentError,
+        token: booking_token,
+        errorCode: appointmentError?.code,
+        errorMessage: appointmentError?.message,
+        errorDetails: appointmentError?.details
+      })
       return NextResponse.json(
-        { error: 'Appointment not found' },
+        {
+          error: 'Appointment not found',
+          debug: process.env.NODE_ENV === 'development' ? {
+            errorCode: appointmentError?.code,
+            errorMessage: appointmentError?.message
+          } : undefined
+        },
         { status: 404 }
       )
     }

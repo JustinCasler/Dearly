@@ -111,11 +111,13 @@ export async function getSessions(statusFilter?: string) {
 
 export async function getSessionDetails(sessionId: string) {
   try {
+    console.log('[getSessionDetails] Fetching session:', sessionId)
+
     const { data: session, error: sessionError } = await supabaseAdmin
       .from('sessions')
       .select(`
         *,
-        users (
+        users!sessions_user_id_fkey (
           id,
           name,
           email,
@@ -125,7 +127,12 @@ export async function getSessionDetails(sessionId: string) {
       .eq('id', sessionId)
       .single()
 
-    if (sessionError) throw sessionError
+    if (sessionError) {
+      console.error('[getSessionDetails] Session error:', sessionError)
+      throw sessionError
+    }
+
+    console.log('[getSessionDetails] Session found:', session?.id)
 
     const { data: questionnaire, error: questionnaireError } = await supabaseAdmin
       .from('questionnaires')
@@ -133,7 +140,12 @@ export async function getSessionDetails(sessionId: string) {
       .eq('session_id', sessionId)
       .single()
 
-    if (questionnaireError) throw questionnaireError
+    if (questionnaireError) {
+      console.error('[getSessionDetails] Questionnaire error:', questionnaireError)
+      throw questionnaireError
+    }
+
+    console.log('[getSessionDetails] Success')
 
     return {
       success: true,
@@ -143,6 +155,7 @@ export async function getSessionDetails(sessionId: string) {
       }
     }
   } catch (error) {
+    console.error('[getSessionDetails] Error:', error)
     return { success: false, error: 'Failed to fetch session details' }
   }
 }
@@ -153,6 +166,7 @@ export async function getSessionDetails(sessionId: string) {
  */
 export async function getUnassignedSessions(): Promise<SessionWithDetails[]> {
   // Use admin client to bypass RLS for fetching unassigned sessions
+  // Show sessions that are paid OR scheduled but don't have an interviewer yet
   const { data, error } = await supabaseAdmin
     .from('sessions')
     .select(`
@@ -161,7 +175,7 @@ export async function getUnassignedSessions(): Promise<SessionWithDetails[]> {
       questionnaire:questionnaires(interviewee_name, relationship_to_interviewee, length_minutes, medium),
       interviewer:users!sessions_interviewer_id_fkey(id, name, email, role)
     `)
-    .eq('status', 'paid')
+    .in('status', ['paid', 'scheduled'])
     .is('interviewer_id', null)
     .order('created_at', { ascending: true })
 
@@ -251,13 +265,18 @@ export async function getAllSessionsWithInterviewers(): Promise<SessionWithDetai
  * Assign a session to the current user (interviewer self-assignment)
  */
 export async function assignSessionToSelf(sessionId: string): Promise<{ success: boolean; error?: string }> {
+  console.log('[assignSessionToSelf] Starting for session:', sessionId)
+
   const supabase = await createServerClient()
 
   // Get current user
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
+    console.error('[assignSessionToSelf] Auth error:', authError)
     return { success: false, error: 'Not authenticated' }
   }
+
+  console.log('[assignSessionToSelf] User authenticated:', user.id)
 
   // Verify user is interviewer or admin
   const { data: userData, error: userError } = await supabase
@@ -267,8 +286,11 @@ export async function assignSessionToSelf(sessionId: string): Promise<{ success:
     .single<{ role: 'customer' | 'interviewer' | 'admin' }>()
 
   if (userError || !userData) {
+    console.error('[assignSessionToSelf] User fetch error:', userError)
     return { success: false, error: 'User not found' }
   }
+
+  console.log('[assignSessionToSelf] User role:', userData.role)
 
   if (userData.role !== 'interviewer' && userData.role !== 'admin') {
     return { success: false, error: 'Unauthorized: Only interviewers can claim sessions' }
@@ -282,17 +304,30 @@ export async function assignSessionToSelf(sessionId: string): Promise<{ success:
     .eq('id', sessionId)
     .single<{ interviewer_id: string | null; status: 'paid' | 'scheduled' | 'completed' | 'delivered' }>()
 
-  if (fetchError || !session) {
+  if (fetchError) {
+    console.error('[assignSessionToSelf] Session fetch error:', fetchError)
+    return { success: false, error: `Session not found: ${fetchError.message}` }
+  }
+
+  if (!session) {
+    console.error('[assignSessionToSelf] Session data is null')
     return { success: false, error: 'Session not found' }
   }
+
+  console.log('[assignSessionToSelf] Session data:', {
+    interviewer_id: session.interviewer_id,
+    status: session.status
+  })
 
   if (session.interviewer_id !== null) {
     return { success: false, error: 'Session already assigned to another interviewer' }
   }
 
-  if (session.status !== 'paid') {
-    return { success: false, error: 'Session must be in paid status to be claimed' }
+  if (session.status !== 'paid' && session.status !== 'scheduled') {
+    return { success: false, error: 'Session must be in paid or scheduled status to be claimed' }
   }
+
+  console.log('[assignSessionToSelf] Attempting to assign session to user:', user.id)
 
   // Update session with interviewer
   const { error: updateError } = await (supabase
@@ -305,8 +340,11 @@ export async function assignSessionToSelf(sessionId: string): Promise<{ success:
     .is('interviewer_id', null) // Double-check to prevent race conditions
 
   if (updateError) {
-    return { success: false, error: 'Failed to assign session. It may have been claimed by another interviewer.' }
+    console.error('[assignSessionToSelf] Update error:', updateError)
+    return { success: false, error: `Failed to assign session: ${updateError.message}` }
   }
+
+  console.log('[assignSessionToSelf] Session assigned successfully')
 
   // Revalidate relevant pages
   revalidatePath('/dashboard/interviewer')

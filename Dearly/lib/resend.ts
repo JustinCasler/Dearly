@@ -44,38 +44,6 @@ export async function sendEmail({ to, subject, html }: SendEmailParams) {
   }
 }
 
-export function getPaymentSuccessEmail(name: string, calendlyLink: string) {
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-          .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>Thank You for Your Purchase!</h1>
-          <p>Hi ${name},</p>
-          <p>Thank you for choosing Dearly to preserve your loved one's story. Your payment has been successfully processed.</p>
-          <p>The next step is to schedule your interview session. Please click the button below to choose a time that works best for you:</p>
-          <a href="${calendlyLink}" class="button">Schedule Your Interview</a>
-          <p>You'll receive a confirmation email once your session is booked. If you have any questions, please don't hesitate to reach out.</p>
-          <p>We look forward to helping you capture these precious memories!</p>
-          <p>Best regards,<br>The Dearly Team</p>
-          <div class="footer">
-            <p>This email was sent by Dearly. If you have any questions, please contact us at ${process.env.INTERNAL_TEAM_EMAIL}</p>
-          </div>
-        </div>
-      </body>
-    </html>
-  `
-}
-
 export function getBookingConfirmationEmail(
   interviewerName: string,
   customerName: string,
@@ -119,6 +87,55 @@ export function getBookingConfirmationEmail(
             `).join('')}
           </div>
           <p>Please review the questions and prepare for the interview. Good luck!</p>
+        </div>
+      </body>
+    </html>
+  `
+}
+
+export function getInterviewReminderEmail(
+  name: string,
+  intervieweeName: string,
+  scheduledTime: string,
+  manageBookingUrl: string
+) {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .info-box { background-color: #f3f4f6; padding: 15px; border-radius: 6px; margin: 15px 0; }
+          .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+          .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Your Dearly Interview is Tomorrow!</h1>
+          <p>Hi ${name},</p>
+          <p>This is a friendly reminder that your interview with ${intervieweeName} is scheduled for tomorrow.</p>
+          <div class="info-box">
+            <p><strong>Interview Time:</strong> ${scheduledTime}</p>
+            <p><strong>Interviewee:</strong> ${intervieweeName}</p>
+          </div>
+          <p>You will receive the meeting link and calendar invite closer to your scheduled time.</p>
+          <p><strong>Tips for a Great Interview:</strong></p>
+          <ul>
+            <li>Find a quiet, comfortable space with good lighting</li>
+            <li>Test your camera and microphone beforehand</li>
+            <li>Have a glass of water nearby</li>
+            <li>Review the questions you submitted</li>
+          </ul>
+          <p>Need to reschedule? You can manage your booking here:</p>
+          <a href="${manageBookingUrl}" class="button">Manage Booking</a>
+          <p>We're looking forward to helping you capture these precious memories!</p>
+          <p>Best regards,<br>The Dearly Team</p>
+          <div class="footer">
+            <p>This email was sent by Dearly. If you have any questions, please contact us at ${process.env.INTERNAL_TEAM_EMAIL}</p>
+          </div>
         </div>
       </body>
     </html>

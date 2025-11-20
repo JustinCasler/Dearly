@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import { sendEmail, getPaymentSuccessEmail } from '@/lib/resend'
 import Stripe from 'stripe'
 
 /**
@@ -160,40 +159,14 @@ export async function POST(req: NextRequest) {
       notes: questionnaire.notes || null,
     } as any)
 
-    // Send confirmation email with booking link
-    const bookingLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/booking/${(sessionRecord as any).id}`
-
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY is not configured! Email will not be sent.')
-    }
-
-    const bookingEmail = `
-      <h1>Thank You for Your Purchase!</h1>
-      <p>Hi ${customerName},</p>
-      <p>Thank you for choosing Dearly to create a meaningful keepsake. Your payment has been received successfully.</p>
-      <h2>Next Step: Schedule Your Interview</h2>
-      <p>Please click the link below to select a time that works best for you:</p>
-      <p><a href="${bookingLink}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Schedule Your Interview</a></p>
-      <p>Or copy this link: ${bookingLink}</p>
-      <p>We look forward to helping you preserve precious memories.</p>
-      <p>Best,<br/>The Dearly Team</p>
-    `
-
-    const emailResult = await sendEmail({
-      to: customerEmail,
-      subject: 'Thank you for your purchase - Schedule your interview',
-      html: bookingEmail,
-    })
-
-    if (!emailResult.success) {
-      console.error('Failed to send email to:', customerEmail, emailResult.error)
-    }
+    // Payment successful - user will be redirected to booking page
+    console.log('Payment processed successfully for:', customerEmail)
+    console.log('Booking link:', `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/booking/${(sessionRecord as any).id}`)
 
     return NextResponse.json({
       success: true,
       message: 'Session processed successfully',
       sessionId: (sessionRecord as any).id,
-      emailSent: emailResult.success,
     })
   } catch (error: any) {
     console.error('Error processing session:', error)

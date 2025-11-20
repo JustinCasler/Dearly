@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     // Get the current appointment
     const { data: appointment, error: appointmentError } = await supabase
       .from('appointments')
-      .select('*, sessions!appointments_session_id_fkey(*), users(*)')
+      .select('*, sessions!appointments_session_id_fkey(*), users!appointments_user_id_fkey(*)')
       .eq('booking_token', booking_token)
       .single()
 
