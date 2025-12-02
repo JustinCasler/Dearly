@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { recordingUploadSchema, RecordingUploadFormData } from '@/lib/validations'
@@ -11,6 +11,7 @@ import {
   uploadRecording,
   getSessionWithInterviewer,
   unassignSession,
+  assignSessionToSelf,
   SessionWithDetails
 } from '@/app/actions/sessions'
 import Link from 'next/link'
@@ -45,13 +46,16 @@ type SessionDetails = {
 export default function SessionDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const sessionId = params.id as string
+  const returnTo = searchParams.get('returnTo') || '/dashboard'
 
   const [details, setDetails] = useState<SessionDetails | null>(null)
   const [sessionWithInterviewer, setSessionWithInterviewer] = useState<SessionWithDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [unassigning, setUnassigning] = useState(false)
+  const [claiming, setClaiming] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
@@ -118,6 +122,27 @@ export default function SessionDetailPage() {
     setUnassigning(false)
   }
 
+  const handleClaim = async () => {
+    setClaiming(true)
+    setError(null)
+    setSuccess(null)
+
+    const result = await assignSessionToSelf(sessionId)
+
+    if (result.success) {
+      setSuccess('Session claimed successfully!')
+      loadSessionDetails()
+      setTimeout(() => {
+        setSuccess(null)
+        router.push('/dashboard/interviewer')
+      }, 1500)
+    } else {
+      setError(result.error || 'Failed to claim session')
+    }
+
+    setClaiming(false)
+  }
+
   const onSubmitRecording = async (data: RecordingUploadFormData) => {
     setUploading(true)
     setError(null)
@@ -161,8 +186,8 @@ export default function SessionDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-gray-600">Session not found</p>
-        <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 mt-4 inline-block">
-          ← Back to Dashboard
+        <Link href={returnTo} className="text-indigo-600 hover:text-indigo-700 mt-4 inline-block">
+          ← Back
         </Link>
       </div>
     )
@@ -172,10 +197,19 @@ export default function SessionDetailPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
-          ← Back to Sessions
+      <div className="mb-6 flex justify-between items-center">
+        <Link href={returnTo} className="text-indigo-600 hover:text-indigo-700">
+          ← Back to {returnTo.includes('available') ? 'Available Sessions' : 'Sessions'}
         </Link>
+        {!sessionWithInterviewer?.interviewer && returnTo.includes('available') && (
+          <button
+            onClick={handleClaim}
+            disabled={claiming}
+            className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {claiming ? 'Claiming...' : 'Claim This Session'}
+          </button>
+        )}
       </div>
 
       {error && (

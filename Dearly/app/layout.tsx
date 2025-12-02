@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Manjari } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const manjari = Manjari({
+  variable: "--font-manjari",
+  weight: ["100", "400", "700"],
   subsets: ["latin"],
   display: "swap",
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
+const conformity = localFont({
+  src: "../public/fonts/Clint Marker.ttf",
+  variable: "--font-clintMarker",
   display: "swap",
 });
 
@@ -27,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${playfair.variable} antialiased`}
+        className={`${manjari.variable} ${conformity.variable} antialiased`}
       >
         {children}
       </body>
