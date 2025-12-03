@@ -42,7 +42,12 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-6 py-16 md:py-24">
+      <section className="container mx-auto px-6 py-16 md:py-24 relative">
+        {/* Heart image - moved up and left with slight clockwise rotation */}
+        <div className="absolute bottom-40 right-48 md:right-56 transition-transform duration-300 hover:scale-110" style={{ transform: 'rotate(15deg)' }}>
+          <Image src="/heart.png" alt="" width={120} height={120} />
+        </div>
+
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
           <h2 className="permanent-marker text-5xl md:text-6xl lg:text-7xl mb-8 md:mb-12 leading-tight" style={{ color: '#0b4e9d' }}>
             PRESERVE YOUR STORIES
@@ -52,18 +57,17 @@ export default function HomePage() {
               Book an interview
             </button>
           </Link>
-          {/* Placeholder for illustration/drawing */}
-          <div className="w-full max-w-2xl h-64 md:h-80 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#e5e2db', border: '2px dashed #737373' }}>
-            <p className="text-lg" style={{ color: '#737373' }}>
-              [Illustration placeholder - Add your drawing here]
-            </p>
-          </div>
         </div>
       </section>
 
       {/* Feature Section 1 - Problem/Solution */}
-      <section className="container mx-auto px-6 py-16 md:py-24">
+      <section className="container mx-auto px-6 py-16 md:py-24 relative">
         <div className="max-w-4xl mx-auto text-center">
+          <div className="flex justify-center mb-8">
+            <div className="transition-transform duration-300 hover:scale-110">
+              <Image src="/mic.png" alt="" width={120} height={120} />
+            </div>
+          </div>
           <h3 className="permanent-marker text-3xl md:text-4xl lg:text-5xl mb-8 leading-tight" style={{ color: '#0b4e9d' }}>
             The best way to keep your family legacy
           </h3>
@@ -120,7 +124,12 @@ export default function HomePage() {
       </section>
 
       {/* Feature Section 2 - Reversed */}
-      <section className="container mx-auto px-6 py-16 md:py-24">
+      <section className="container mx-auto px-6 py-16 md:py-24 relative">
+        {/* Hug image - on website background, larger and more left */}
+        <div className="absolute top-[45%] right-0 md:right-32 transform -translate-y-1/2 transition-transform duration-300 hover:scale-110">
+          <Image src="/hug.png" alt="" width={250} height={250} />
+        </div>
+
         <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           <div className="order-2 md:order-1">
             <h3 className="permanent-marker text-3xl md:text-4xl mb-6 leading-tight" style={{ color: '#0b4e9d' }}>
@@ -131,11 +140,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="order-1 md:order-2 relative">
-            <div className="relative w-full h-[500px] rounded-3xl overflow-hidden shadow-xl flex items-center justify-center" style={{ backgroundColor: '#e5e2db', border: '2px dashed #737373' }}>
-              <p className="text-lg" style={{ color: '#737373' }}>
-                [Illustration placeholder]
-              </p>
-            </div>
+            {/* Removed background container */}
           </div>
         </div>
       </section>
@@ -149,7 +154,7 @@ export default function HomePage() {
       </div>
 
       {/* Feature Section 3 */}
-      <section className="container mx-auto px-6 py-16 md:py-24">
+      <section className="container mx-auto px-6 py-16 md:py-24 relative">
         <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           <div className="relative">
             <div className="relative mx-auto w-64 h-[500px] rounded-[3rem] border-8 border-black overflow-hidden shadow-2xl" style={{ backgroundColor: '#fff' }}>
@@ -220,12 +225,17 @@ export default function HomePage() {
       </div>
 
       {/* Feature Section 4 - Pricing */}
-      <section className="container mx-auto px-6 py-16 md:py-24">
+      <section className="container mx-auto px-6 py-16 md:py-24 relative">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h3 className="permanent-marker text-3xl md:text-4xl lg:text-5xl mb-6 leading-tight" style={{ color: '#0b4e9d' }}>
-              Choose your Dearly plan
-            </h3>
+            <div className="flex justify-center items-center gap-6 mb-6">
+              <h3 className="permanent-marker text-3xl md:text-4xl lg:text-5xl leading-tight" style={{ color: '#0b4e9d' }}>
+                Choose your Dearly plan
+              </h3>
+              <div className="transition-transform duration-300 hover:scale-110">
+                <Image src="/smile.png" alt="" width={80} height={80} />
+              </div>
+            </div>
             <p className="text-lg md:text-xl mb-8 opacity-80 max-w-3xl mx-auto" style={{ color: '#0b4e9d' }}>
               Select from our different plans. All include a 60-minute session with a caring, well-trained interviewer, high-quality audio recording, and professional editing.
             </p>
@@ -348,8 +358,13 @@ export default function HomePage() {
       </section>
 
       {/* Join Section */}
-      <section className="container mx-auto px-6 py-16 md:py-24">
+      <section className="container mx-auto px-6 py-16 md:py-24 relative">
         <div className="max-w-2xl mx-auto text-center">
+          <div className="flex justify-center mb-8">
+            <div className="transition-transform duration-300 hover:scale-110">
+              <Image src="/hands.png" alt="" width={120} height={120} />
+            </div>
+          </div>
           <h3 className="permanent-marker text-4xl md:text-5xl mb-6" style={{ color: '#0b4e9d' }}>
             Start preserving memories today
           </h3>
@@ -367,15 +382,12 @@ export default function HomePage() {
       </section>
 
       {/* Food for Thought / Final CTA Section */}
-      <section className="container mx-auto px-6 py-16 md:py-24">
+      <section className="container mx-auto px-6 py-16 md:py-24 relative">
         <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-          <div className="relative h-96 rounded-3xl overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-            <Image
-              src="/emailcapture.png"
-              alt="Email capture"
-              fill
-              className="object-cover"
-            />
+          <div className="relative h-96 flex items-center justify-center">
+            <div className="transition-transform duration-300 hover:scale-110">
+              <Image src="/mail.png" alt="" width={180} height={180} />
+            </div>
           </div>
           <div>
             <h3 className="permanent-marker text-3xl md:text-4xl mb-6" style={{ color: '#0b4e9d' }}>
