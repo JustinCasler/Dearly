@@ -78,7 +78,7 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <div className="bg-white p-8 rounded-2xl shadow-sm text-left transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group cursor-pointer">
-              <h4 className="text-xl font-bold mb-3 pb-2 transition-colors duration-300 inline-block border-b-4" style={{ color: '#0b4e9d', borderColor: '#0b4e9d' }}>
+              <h4 className="text-xl font-bold mb-3 pb-2 transition-colors duration-300 inline-block border-b-4" style={{ color: '#0b4e9d', borderColor: '#B7CF3F' }}>
                 Professional Audio Recordings
               </h4>
               <p className="opacity-70" style={{ color: '#0b4e9d' }}>
@@ -87,7 +87,7 @@ export default function HomePage() {
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-sm text-left transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group cursor-pointer">
-              <h4 className="text-xl font-bold mb-3 pb-2 transition-colors duration-300 inline-block border-b-4" style={{ color: '#0b4e9d', borderColor: '#0b4e9d' }}>
+              <h4 className="text-xl font-bold mb-3 pb-2 transition-colors duration-300 inline-block border-b-4" style={{ color: '#0b4e9d', borderColor: '#B7CF3F' }}>
                 Written Memoirs
               </h4>
               <p className="opacity-70" style={{ color: '#0b4e9d' }}>
@@ -96,7 +96,7 @@ export default function HomePage() {
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-sm text-left transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group cursor-pointer">
-              <h4 className="text-xl font-bold mb-3 pb-2 transition-colors duration-300 inline-block border-b-4" style={{ color: '#0b4e9d', borderColor: '#0b4e9d' }}>
+              <h4 className="text-xl font-bold mb-3 pb-2 transition-colors duration-300 inline-block border-b-4" style={{ color: '#0b4e9d', borderColor: '#B7CF3F' }}>
                 Complete Transcripts
               </h4>
               <p className="opacity-70" style={{ color: '#0b4e9d' }}>
@@ -105,7 +105,7 @@ export default function HomePage() {
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-sm text-left transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group cursor-pointer">
-              <h4 className="text-xl font-bold mb-3 pb-2 transition-colors duration-300 inline-block border-b-4" style={{ color: '#0b4e9d', borderColor: '#0b4e9d' }}>
+              <h4 className="text-xl font-bold mb-3 pb-2 transition-colors duration-300 inline-block border-b-4" style={{ color: '#0b4e9d', borderColor: '#B7CF3F' }}>
                 Family Tree Integration
               </h4>
               <p className="opacity-70" style={{ color: '#0b4e9d' }}>
@@ -252,15 +252,15 @@ export default function HomePage() {
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
-                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-lg" style={{ color: '#B7CF3F' }}>✓</span>
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>1-hour guided audio interview (remote)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-lg" style={{ color: '#B7CF3F' }}>✓</span>
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Edited audio with music</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-lg" style={{ color: '#B7CF3F' }}>✓</span>
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Delivered digitally</span>
                 </li>
               </ul>
@@ -272,8 +272,8 @@ export default function HomePage() {
             </div>
 
             {/* Dearly Gift - Popular */}
-            <div className="bg-white rounded-3xl p-8 shadow-xl relative border-4 flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-3" style={{ borderColor: '#0b4e9d' }}>
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-white text-xs font-bold" style={{ backgroundColor: '#0b4e9d' }}>
+            <div className="bg-white rounded-3xl p-8 shadow-xl relative border-4 flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-3" style={{ borderColor: '#B7CF3F' }}>
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-white text-xs font-bold" style={{ backgroundColor: '#B7CF3F' }}>
                 MOST POPULAR
               </div>
               <div className="text-center mb-6">
@@ -282,15 +282,15 @@ export default function HomePage() {
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
-                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-lg" style={{ color: '#B7CF3F' }}>✓</span>
                   <span className="text-sm font-semibold opacity-80" style={{ color: '#0b4e9d' }}>Everything in Essential +</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-lg" style={{ color: '#B7CF3F' }}>✓</span>
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Full polished transcript</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-lg" style={{ color: '#B7CF3F' }}>✓</span>
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>AI-generated mini biography</span>
                 </li>
               </ul>
@@ -309,15 +309,15 @@ export default function HomePage() {
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
-                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-lg" style={{ color: '#B7CF3F' }}>✓</span>
                   <span className="text-sm font-semibold opacity-80" style={{ color: '#0b4e9d' }}>Everything in Gift +</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-lg" style={{ color: '#B7CF3F' }}>✓</span>
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Free interview for another family member</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-lg" style={{ color: '#B7CF3F' }}>✓</span>
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Early access to downloadable family e-book (PDF) after 3 family interviews</span>
                 </li>
               </ul>
