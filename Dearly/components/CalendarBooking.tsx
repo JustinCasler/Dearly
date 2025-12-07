@@ -97,20 +97,20 @@ export default function CalendarBooking({
             <button
               onClick={handlePrevious}
               className="p-2 rounded-full transition-all duration-300 hover:scale-110"
-              style={{ color: '#1A0089' }}
+              style={{ color: '#0b4e9d' }}
               aria-label="Previous month"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h2 className="text-2xl font-bold font-serif min-w-[200px] text-center" style={{ color: '#1A0089' }}>
+            <h2 className="text-2xl font-bold font-serif min-w-[200px] text-center" style={{ color: '#0b4e9d' }}>
               {format(currentDate, 'MMMM yyyy')}
             </h2>
             <button
               onClick={handleNext}
               className="p-2 rounded-full transition-all duration-300 hover:scale-110"
-              style={{ color: '#1A0089' }}
+              style={{ color: '#0b4e9d' }}
               aria-label="Next month"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -122,7 +122,7 @@ export default function CalendarBooking({
           {/* Day headers */}
           <div className="grid grid-cols-7 gap-1.5 mb-2">
             {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day) => (
-              <div key={day} className="text-center text-xs font-bold py-1.5 opacity-60" style={{ color: '#1A0089' }}>
+              <div key={day} className="text-center text-xs font-bold py-1.5 opacity-60" style={{ color: '#0b4e9d' }}>
                 {day}
               </div>
             ))}
@@ -148,8 +148,8 @@ export default function CalendarBooking({
                     ${hasSlots && !isToday && !isSelected ? 'hover:scale-105 cursor-pointer' : ''}
                   `}
                   style={{
-                    color: isToday || isSelected ? '#FFFFFF' : hasSlots ? '#1A0089' : '#1A0089',
-                    backgroundColor: isToday ? '#1A0089' : isSelected ? '#B7CF3F' : hasSlots ? 'rgba(183, 207, 63, 0.1)' : 'transparent'
+                    color: isToday || isSelected ? '#FFFFFF' : hasSlots ? '#0b4e9d' : '#0b4e9d',
+                    backgroundColor: isToday ? '#0b4e9d' : isSelected ? '#B7CF3F' : hasSlots ? 'rgba(183, 207, 63, 0.1)' : 'transparent'
                   }}
                 >
                   <div className="flex flex-col items-center justify-center h-full">
@@ -165,10 +165,10 @@ export default function CalendarBooking({
         </div>
 
         {/* Time Slots Section */}
-        <div className="md:border-l-2 md:pl-6 border-t-2 md:border-t-0 pt-6 md:pt-0 overflow-x-hidden" style={{ borderColor: 'rgba(26, 0, 137, 0.1)' }}>
+        <div className="md:border-l-2 md:pl-6 border-t-2 md:border-t-0 pt-6 md:pt-0 overflow-x-hidden" style={{ borderColor: 'rgba(11, 78, 157, 0.1)' }}>
           {selectedDay ? (
             <>
-              <h3 className="text-lg font-bold font-serif mb-4" style={{ color: '#1A0089' }}>
+              <h3 className="text-lg font-bold font-serif mb-4" style={{ color: '#0b4e9d' }}>
                 {format(selectedDay, 'EEEE, MMMM d')}
               </h3>
               <div className="space-y-3 max-h-[500px] overflow-y-auto overflow-x-hidden pr-2">
@@ -187,23 +187,23 @@ export default function CalendarBooking({
                         }
                       `}
                       style={{
-                        borderColor: selectedSlotId === slot.id ? '#1A0089' : 'rgba(26, 0, 137, 0.2)',
-                        backgroundColor: selectedSlotId === slot.id ? '#1A0089' : '#FEFEFE',
-                        color: selectedSlotId === slot.id ? '#FFFFFF' : '#1A0089'
+                        borderColor: selectedSlotId === slot.id ? '#0b4e9d' : 'rgba(11, 78, 157, 0.2)',
+                        backgroundColor: selectedSlotId === slot.id ? '#0b4e9d' : '#FEFEFE',
+                        color: selectedSlotId === slot.id ? '#FFFFFF' : '#0b4e9d'
                       }}
                     >
                       {format(slot.start, 'h:mm a')}
                     </button>
                   ))}
                 {daySlots.filter(slot => !slot.isBooked).length === 0 && (
-                  <p className="text-sm text-center py-8 opacity-60" style={{ color: '#1A0089' }}>
+                  <p className="text-sm text-center py-8 opacity-60" style={{ color: '#0b4e9d' }}>
                     No available time slots for this day
                   </p>
                 )}
               </div>
             </>
           ) : (
-            <div className="flex items-center justify-center h-full text-sm text-center opacity-60" style={{ color: '#1A0089' }}>
+            <div className="flex items-center justify-center h-full text-sm text-center opacity-60" style={{ color: '#0b4e9d' }}>
               <p>Select a date to see available times</p>
             </div>
           )}

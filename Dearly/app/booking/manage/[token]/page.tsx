@@ -172,10 +172,10 @@ export default function ManageBooking() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f4f1ea' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your booking...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: '#0b4e9d' }}></div>
+          <p className="mt-4 opacity-70" style={{ color: '#0b4e9d' }}>Loading your booking...</p>
         </div>
       </div>
     )
@@ -183,18 +183,19 @@ export default function ManageBooking() {
 
   if (error && !appointment) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f4f1ea' }}>
+        <div className="max-w-md w-full bg-white shadow-sm rounded-2xl p-8 text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Not Found</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#0b4e9d' }}>Booking Not Found</h2>
+          <p className="mb-6 opacity-70" style={{ color: '#0b4e9d' }}>{error}</p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="px-6 py-3 text-white rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            style={{ backgroundColor: '#0b4e9d' }}
           >
             Go to Homepage
           </button>
@@ -204,25 +205,25 @@ export default function ManageBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#f4f1ea' }}>
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="bg-white shadow rounded-lg p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Manage Your Booking</h1>
-          <p className="text-gray-600">View or modify your scheduled interview</p>
+        <div className="bg-white shadow-sm rounded-2xl p-6 mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#0b4e9d' }}>Manage Your Booking</h1>
+          <p className="opacity-70" style={{ color: '#0b4e9d' }}>View or modify your scheduled interview</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-800">
+          <div className="mb-6 p-4 rounded-2xl" style={{ backgroundColor: '#FEE', borderColor: '#FF5E33', color: '#991B1B' }}>
             {error}
           </div>
         )}
 
         {/* Appointment Details */}
         {!showReschedule && appointment && (
-          <div className="bg-white shadow rounded-lg p-6 mb-6">
+          <div className="bg-white shadow-sm rounded-2xl p-6 mb-6">
             <div className="flex items-start justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Appointment Details</h2>
+              <h2 className="text-xl font-semibold" style={{ color: '#0b4e9d' }}>Appointment Details</h2>
               <span
                 className={`px-3 py-1 text-sm font-medium rounded-full ${
                   appointment.status === 'scheduled'
@@ -238,18 +239,18 @@ export default function ManageBooking() {
 
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600">Customer</p>
-                <p className="text-lg font-medium text-gray-900">{appointment.users?.name || 'N/A'}</p>
+                <p className="text-sm opacity-70" style={{ color: '#0b4e9d' }}>Customer</p>
+                <p className="text-lg font-medium" style={{ color: '#0b4e9d' }}>{appointment.users?.name || 'N/A'}</p>
               </div>
 
               <div>
-                <p className="text-sm text-gray-600">Email</p>
-                <p className="text-lg text-gray-900">{appointment.users?.email || 'N/A'}</p>
+                <p className="text-sm opacity-70" style={{ color: '#0b4e9d' }}>Email</p>
+                <p className="text-lg" style={{ color: '#0b4e9d' }}>{appointment.users?.email || 'N/A'}</p>
               </div>
 
               <div>
-                <p className="text-sm text-gray-600">Scheduled Time (EST)</p>
-                <p className="text-lg font-medium text-gray-900">
+                <p className="text-sm opacity-70" style={{ color: '#0b4e9d' }}>Scheduled Time (EST)</p>
+                <p className="text-lg font-medium" style={{ color: '#0b4e9d' }}>
                   {formatDateTime(appointment.start_time)}
                 </p>
               </div>
@@ -272,14 +273,16 @@ export default function ManageBooking() {
                     fetchAvailableSlots()
                   }}
                   disabled={processing}
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                  className="flex-1 px-6 py-3 text-white rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50"
+                  style={{ backgroundColor: '#0b4e9d' }}
                 >
                   Reschedule
                 </button>
                 <button
                   onClick={handleCancel}
                   disabled={processing}
-                  className="flex-1 px-6 py-3 bg-white text-red-600 border-2 border-red-600 rounded-md hover:bg-red-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-300 transition-colors"
+                  className="flex-1 px-6 py-3 bg-white border-2 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ color: '#FF5E33', borderColor: '#FF5E33' }}
                 >
                   Cancel Appointment
                 </button>
@@ -291,9 +294,9 @@ export default function ManageBooking() {
         {/* Reschedule View */}
         {showReschedule && (
           <>
-            <div className="bg-white shadow rounded-lg p-6 mb-6">
+            <div className="bg-white shadow-sm rounded-2xl p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Select New Time</h2>
+                <h2 className="text-xl font-semibold" style={{ color: '#0b4e9d' }}>Select New Time</h2>
                 <button
                   onClick={() => {
                     setShowReschedule(false)
@@ -308,33 +311,38 @@ export default function ManageBooking() {
                 </button>
               </div>
 
-              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-                <p className="text-sm text-blue-900">
+              <div className="mb-4 p-4 rounded-2xl" style={{ backgroundColor: 'rgba(11, 78, 157, 0.1)' }}>
+                <p className="text-sm" style={{ color: '#0b4e9d' }}>
                   <strong>Current Time:</strong> {formatDateTime(appointment.start_time)} EST
                 </p>
               </div>
 
               {availableSlots.length === 0 ? (
-                <p className="text-gray-600 text-center py-8">No available time slots at the moment</p>
+                <p className="text-center py-8 opacity-70" style={{ color: '#0b4e9d' }}>No available time slots at the moment</p>
               ) : (
                 <div className="space-y-6">
                   {Object.entries(groupedSlots).map(([date, dateSlots]) => (
                     <div key={date}>
-                      <h3 className="text-lg font-medium text-gray-900 mb-3">{date}</h3>
+                      <h3 className="text-lg font-medium mb-3" style={{ color: '#0b4e9d' }}>{date}</h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                         {dateSlots.map((slot) => (
                           <button
                             key={slot.id}
                             onClick={() => setSelectedSlot(slot.id)}
-                            className={`p-4 border-2 rounded-lg transition-all ${
+                            className={`p-4 border-2 rounded-2xl transition-all ${
                               selectedSlot === slot.id
-                                ? 'border-blue-600 bg-blue-50 text-blue-900'
-                                : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+                                ? 'shadow-md'
+                                : 'hover:shadow-sm'
                             }`}
+                            style={{
+                              borderColor: selectedSlot === slot.id ? '#0b4e9d' : 'rgba(11, 78, 157, 0.2)',
+                              backgroundColor: selectedSlot === slot.id ? 'rgba(11, 78, 157, 0.1)' : 'white',
+                              color: '#0b4e9d'
+                            }}
                           >
                             <div className="text-center">
                               <div className="font-medium">{formatTime(slot.start_time)}</div>
-                              <div className="text-sm text-gray-500">{formatTime(slot.end_time)}</div>
+                              <div className="text-sm opacity-60">{formatTime(slot.end_time)}</div>
                             </div>
                           </button>
                         ))}
@@ -346,11 +354,12 @@ export default function ManageBooking() {
             </div>
 
             {availableSlots.length > 0 && (
-              <div className="bg-white shadow rounded-lg p-6">
+              <div className="bg-white shadow-sm rounded-2xl p-6">
                 <button
                   onClick={handleReschedule}
                   disabled={!selectedSlot || processing}
-                  className="w-full px-6 py-3 bg-blue-600 text-white text-lg font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                  className="w-full px-6 py-3 text-white text-lg font-semibold rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: selectedSlot && !processing ? '#0b4e9d' : '#9CA3AF' }}
                 >
                   {processing ? 'Rescheduling...' : 'Confirm New Time'}
                 </button>

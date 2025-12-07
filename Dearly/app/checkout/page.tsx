@@ -249,7 +249,7 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold font-serif mb-3" style={{ color: '#0b4e9d' }}>
+          <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{ color: '#0b4e9d' }}>
             {currentStep === 1 ? 'Book Your Interview' : 'Interview Questions'}
           </h1>
           <p className="text-lg mb-8 opacity-70" style={{ color: '#0b4e9d' }}>
@@ -270,7 +270,7 @@ export default function CheckoutPage() {
               <>
             {/* Your Information */}
             <div>
-              <h2 className="text-2xl font-bold font-serif mb-4" style={{ color: '#0b4e9d' }}>Your Information</h2>
+              <h2 className="text-2xl font-bold mb-4" style={{ color: '#0b4e9d' }}>Your Information</h2>
               
               <div className="space-y-4">
                 <div>
@@ -309,7 +309,7 @@ export default function CheckoutPage() {
 
             {/* Interview Details */}
             <div>
-              <h2 className="text-2xl font-bold font-serif mb-4" style={{ color: '#0b4e9d' }}>Interview Details</h2>
+              <h2 className="text-2xl font-bold mb-4" style={{ color: '#0b4e9d' }}>Interview Details</h2>
               
               <div className="space-y-4">
                 <div>
@@ -407,7 +407,7 @@ export default function CheckoutPage() {
             {currentStep === 2 && (
               <>
             <div>
-              <h2 className="text-2xl font-bold font-serif mb-2" style={{ color: '#0b4e9d' }}>Interview Questions</h2>
+              <h2 className="text-2xl font-bold mb-2" style={{ color: '#0b4e9d' }}>Interview Questions</h2>
               <p className="text-sm mb-4 opacity-70" style={{ color: '#0b4e9d' }}>
                 Choose a theme to get pre-populated questions, or create your own custom questions.
               </p>
@@ -548,7 +548,7 @@ export default function CheckoutPage() {
                 <p className="mt-2 text-sm" style={{ color: '#FF5E33' }}>{errors.questions.message}</p>
               )}
 
-              {fields.length < 20 && (
+              {fields.length < 12 && (
                 <button
                   type="button"
                   onClick={() => append({ id: Date.now().toString(), text: '' })}
@@ -576,7 +576,7 @@ export default function CheckoutPage() {
 
             {/* Summary */}
             <div className="p-8 rounded-2xl" style={{ backgroundColor: 'rgba(150, 173, 217, 0.15)' }}>
-              <h3 className="font-bold font-serif text-xl mb-3" style={{ color: '#0b4e9d' }}>Order Summary</h3>
+              <h3 className="font-bold text-xl mb-3" style={{ color: '#0b4e9d' }}>Order Summary</h3>
               <div className="flex justify-between items-center">
                 <span className="text-lg" style={{ color: '#0b4e9d' }}>
                   {lengthMinutes}-minute interview session
@@ -589,7 +589,7 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full text-white py-4 rounded-full font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+              className="w-full text-white py-4 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
               style={{ backgroundColor: '#0b4e9d' }}
             >
               {isSubmitting ? 'Processing...' : 'Proceed to Payment'}

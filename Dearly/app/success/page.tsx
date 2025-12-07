@@ -59,8 +59,8 @@ function SuccessContent() {
   }, [sessionId, questionnaireEncoded])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center px-4">
-      <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8 text-center">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f4f1ea' }}>
+      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-sm p-8 text-center">
         <div className="mb-6">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
@@ -77,24 +77,24 @@ function SuccessContent() {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#0b4e9d' }}>
             Payment Successful!
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg opacity-70" style={{ color: '#0b4e9d' }}>
             Thank you for choosing Dearly
           </p>
         </div>
 
         {processing && !error && (
-          <div className="bg-blue-50 rounded-lg p-6 mb-8">
+          <div className="rounded-2xl p-6 mb-8" style={{ backgroundColor: 'rgba(11, 78, 157, 0.1)' }}>
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <p className="text-blue-700 font-medium">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2" style={{ borderColor: '#0b4e9d' }}></div>
+              <p className="font-medium" style={{ color: '#0b4e9d' }}>
                 Processing your payment...
               </p>
             </div>
             {bookingSessionId && (
-              <p className="text-blue-600 text-sm">
+              <p className="text-sm opacity-70" style={{ color: '#0b4e9d' }}>
                 Redirecting you to schedule your interview...
               </p>
             )}
@@ -102,12 +102,12 @@ function SuccessContent() {
         )}
 
         {error && (
-          <div className="bg-red-50 rounded-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold text-red-900 mb-2">
+          <div className="rounded-2xl p-6 mb-8" style={{ backgroundColor: '#FEE', borderColor: '#FF5E33' }}>
+            <h2 className="text-xl font-semibold mb-2" style={{ color: '#991B1B' }}>
               Processing Error
             </h2>
-            <p className="text-red-700">{error}</p>
-            <p className="text-sm text-red-600 mt-4">
+            <p style={{ color: '#991B1B' }}>{error}</p>
+            <p className="text-sm mt-4" style={{ color: '#991B1B' }}>
               Don&apos;t worry, your payment was successful. Please contact us at{' '}
               <a href="mailto:team@dearly.com" className="underline">
                 team@dearly.com
@@ -118,24 +118,24 @@ function SuccessContent() {
         )}
 
         {!error && (
-          <div className="bg-indigo-50 rounded-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-3">What&apos;s Next?</h2>
+          <div className="rounded-2xl p-6 mb-8" style={{ backgroundColor: 'rgba(11, 78, 157, 0.1)' }}>
+            <h2 className="text-xl font-semibold mb-3" style={{ color: '#0b4e9d' }}>What&apos;s Next?</h2>
             <div className="text-left space-y-3">
               <div className="flex gap-3">
-                <span className="text-indigo-600 font-bold">1.</span>
-                <p className="text-gray-700">
+                <span className="font-bold" style={{ color: '#0b4e9d' }}>1.</span>
+                <p style={{ color: '#0b4e9d' }}>
                   Select a time that works for you from our available slots
                 </p>
               </div>
               <div className="flex gap-3">
-                <span className="text-indigo-600 font-bold">2.</span>
-                <p className="text-gray-700">
+                <span className="font-bold" style={{ color: '#0b4e9d' }}>2.</span>
+                <p style={{ color: '#0b4e9d' }}>
                   You&apos;ll receive a confirmation email with all the details
                 </p>
               </div>
               <div className="flex gap-3">
-                <span className="text-indigo-600 font-bold">3.</span>
-                <p className="text-gray-700">
+                <span className="font-bold" style={{ color: '#0b4e9d' }}>3.</span>
+                <p style={{ color: '#0b4e9d' }}>
                   We&apos;ll send you the final recording within 5-7 business days after the interview
                 </p>
               </div>
@@ -147,7 +147,8 @@ function SuccessContent() {
           <div className="space-y-4">
             <Link
               href="/"
-              className="inline-block bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+              className="inline-block text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1"
+              style={{ backgroundColor: '#0b4e9d' }}
             >
               Return to Home
             </Link>
@@ -161,11 +162,11 @@ function SuccessContent() {
 export default function SuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center px-4">
-        <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8 text-center">
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f4f1ea' }}>
+        <div className="max-w-2xl w-full bg-white rounded-2xl shadow-sm p-8 text-center">
           <div className="flex items-center justify-center gap-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
-            <p className="text-gray-700">Loading...</p>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2" style={{ borderColor: '#0b4e9d' }}></div>
+            <p style={{ color: '#0b4e9d' }}>Loading...</p>
           </div>
         </div>
       </div>
