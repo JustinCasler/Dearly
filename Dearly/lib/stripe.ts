@@ -5,9 +5,9 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
 })
 
-export const PRICE_30_MIN = 15000 // $150 in cents
-export const PRICE_60_MIN = 25000 // $250 in cents
-export const PRICE_90_MIN = 35000 // $350 in cents
+export const PRICE_30_MIN = 9900 // $99 in cents
+export const PRICE_60_MIN = 13900 // $139 in cents
+export const PRICE_90_MIN = 19900 // $199 in cents
 
 export function getPriceForLength(minutes: 30 | 60 | 90): number {
   switch (minutes) {

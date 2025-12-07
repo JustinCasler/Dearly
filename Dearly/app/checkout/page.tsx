@@ -215,13 +215,13 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen py-12" style={{ backgroundColor: '#F2EEE9' }}>
+    <div className="min-h-screen py-12" style={{ backgroundColor: '#f4f1ea' }}>
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="mb-8">
           <button
             onClick={handleBackButton}
             className="hover:opacity-70 transition"
-            style={{ color: '#1A0089' }}
+            style={{ color: '#0b4e9d' }}
           >
             ← {currentStep === 2 ? 'Back' : 'Back to Home'}
           </button>
@@ -231,10 +231,10 @@ export default function CheckoutPage() {
           {/* Progress Indicator */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <span className={`text-sm font-medium ${currentStep >= 1 ? '' : 'opacity-50'}`} style={{ color: '#1A0089' }}>
+              <span className={`text-sm font-medium ${currentStep >= 1 ? '' : 'opacity-50'}`} style={{ color: '#0b4e9d' }}>
                 1. Background Info
               </span>
-              <span className={`text-sm font-medium ${currentStep >= 2 ? '' : 'opacity-50'}`} style={{ color: '#1A0089' }}>
+              <span className={`text-sm font-medium ${currentStep >= 2 ? '' : 'opacity-50'}`} style={{ color: '#0b4e9d' }}>
                 2. Interview Questions
               </span>
             </div>
@@ -242,17 +242,17 @@ export default function CheckoutPage() {
               <div
                 className="h-2 rounded-full transition-all duration-500"
                 style={{
-                  backgroundColor: '#1A0089',
+                  backgroundColor: '#0b4e9d',
                   width: currentStep === 1 ? '50%' : '100%'
                 }}
               />
             </div>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold font-serif mb-3" style={{ color: '#1A0089' }}>
+          <h1 className="text-4xl md:text-5xl font-bold font-serif mb-3" style={{ color: '#0b4e9d' }}>
             {currentStep === 1 ? 'Book Your Interview' : 'Interview Questions'}
           </h1>
-          <p className="text-lg mb-8 opacity-70" style={{ color: '#1A0089' }}>
+          <p className="text-lg mb-8 opacity-70" style={{ color: '#0b4e9d' }}>
             {currentStep === 1
               ? 'Tell us about the interview you\'d like to schedule.'
               : 'Choose a theme or create custom questions for the interview.'}
@@ -270,11 +270,11 @@ export default function CheckoutPage() {
               <>
             {/* Your Information */}
             <div>
-              <h2 className="text-2xl font-bold font-serif mb-4" style={{ color: '#1A0089' }}>Your Information</h2>
+              <h2 className="text-2xl font-bold font-serif mb-4" style={{ color: '#0b4e9d' }}>Your Information</h2>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#1A0089' }}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
                     Your Name *
                   </label>
                   <input
@@ -290,7 +290,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#1A0089' }}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
                     Your Email *
                   </label>
                   <input
@@ -309,11 +309,11 @@ export default function CheckoutPage() {
 
             {/* Interview Details */}
             <div>
-              <h2 className="text-2xl font-bold font-serif mb-4" style={{ color: '#1A0089' }}>Interview Details</h2>
+              <h2 className="text-2xl font-bold font-serif mb-4" style={{ color: '#0b4e9d' }}>Interview Details</h2>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#1A0089' }}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
                     Who will be interviewed? *
                   </label>
                   <input
@@ -329,7 +329,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#1A0089' }}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
                     Your relationship to the interviewee *
                   </label>
                   <input
@@ -345,7 +345,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#1A0089' }}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
                     Session Length *
                   </label>
                   <select
@@ -363,7 +363,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#1A0089' }}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
                     Interview Medium *
                   </label>
                   <select
@@ -395,7 +395,7 @@ export default function CheckoutPage() {
                 type="button"
                 onClick={handleNextStep}
                 className="px-8 py-4 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 text-lg"
-                style={{ backgroundColor: '#1A0089' }}
+                style={{ backgroundColor: '#0b4e9d' }}
               >
                 Continue to Questions →
               </button>
@@ -407,14 +407,14 @@ export default function CheckoutPage() {
             {currentStep === 2 && (
               <>
             <div>
-              <h2 className="text-2xl font-bold font-serif mb-2" style={{ color: '#1A0089' }}>Interview Questions</h2>
-              <p className="text-sm mb-4 opacity-70" style={{ color: '#1A0089' }}>
+              <h2 className="text-2xl font-bold font-serif mb-2" style={{ color: '#0b4e9d' }}>Interview Questions</h2>
+              <p className="text-sm mb-4 opacity-70" style={{ color: '#0b4e9d' }}>
                 Choose a theme to get pre-populated questions, or create your own custom questions.
               </p>
 
               {/* Theme Selector */}
               <div className="mb-6">
-                <label className="block text-sm font-medium mb-3" style={{ color: '#1A0089' }}>
+                <label className="block text-sm font-medium mb-3" style={{ color: '#0b4e9d' }}>
                   Select Interview Theme
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -425,12 +425,12 @@ export default function CheckoutPage() {
                       selectedTheme === 'life-story' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
                     }`}
                     style={{
-                      borderColor: '#1A0089',
+                      borderColor: '#0b4e9d',
                       backgroundColor: selectedTheme === 'life-story' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
                     }}
                   >
-                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Life Story</div>
-                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                    <div className="font-semibold mb-1" style={{ color: '#0b4e9d' }}>Life Story</div>
+                    <div className="text-xs opacity-70" style={{ color: '#0b4e9d' }}>
                       Comprehensive questions about their life journey
                     </div>
                   </button>
@@ -442,12 +442,12 @@ export default function CheckoutPage() {
                       selectedTheme === 'life-advice' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
                     }`}
                     style={{
-                      borderColor: '#1A0089',
+                      borderColor: '#0b4e9d',
                       backgroundColor: selectedTheme === 'life-advice' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
                     }}
                   >
-                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Life Advice</div>
-                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                    <div className="font-semibold mb-1" style={{ color: '#0b4e9d' }}>Life Advice</div>
+                    <div className="text-xs opacity-70" style={{ color: '#0b4e9d' }}>
                       Wisdom, lessons learned, and guidance for future generations
                     </div>
                   </button>
@@ -459,12 +459,12 @@ export default function CheckoutPage() {
                       selectedTheme === 'family-stories' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
                     }`}
                     style={{
-                      borderColor: '#1A0089',
+                      borderColor: '#0b4e9d',
                       backgroundColor: selectedTheme === 'family-stories' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
                     }}
                   >
-                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Family Stories</div>
-                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                    <div className="font-semibold mb-1" style={{ color: '#0b4e9d' }}>Family Stories</div>
+                    <div className="text-xs opacity-70" style={{ color: '#0b4e9d' }}>
                       Family history, traditions, and memorable moments
                     </div>
                   </button>
@@ -476,12 +476,12 @@ export default function CheckoutPage() {
                       selectedTheme === 'hobbies-interests' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
                     }`}
                     style={{
-                      borderColor: '#1A0089',
+                      borderColor: '#0b4e9d',
                       backgroundColor: selectedTheme === 'hobbies-interests' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
                     }}
                   >
-                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Hobbies & Interests</div>
-                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                    <div className="font-semibold mb-1" style={{ color: '#0b4e9d' }}>Hobbies & Interests</div>
+                    <div className="text-xs opacity-70" style={{ color: '#0b4e9d' }}>
                       Passions, skills, and meaningful experiences
                     </div>
                   </button>
@@ -493,12 +493,12 @@ export default function CheckoutPage() {
                       selectedTheme === '' ? 'border-opacity-100 shadow-md' : 'border-opacity-20'
                     }`}
                     style={{
-                      borderColor: '#1A0089',
+                      borderColor: '#0b4e9d',
                       backgroundColor: selectedTheme === '' ? 'rgba(26, 0, 137, 0.05)' : '#FEFEFE'
                     }}
                   >
-                    <div className="font-semibold mb-1" style={{ color: '#1A0089' }}>Custom Questions</div>
-                    <div className="text-xs opacity-70" style={{ color: '#1A0089' }}>
+                    <div className="font-semibold mb-1" style={{ color: '#0b4e9d' }}>Custom Questions</div>
+                    <div className="text-xs opacity-70" style={{ color: '#0b4e9d' }}>
                       Create your own personalized questions
                     </div>
                   </button>
@@ -507,7 +507,7 @@ export default function CheckoutPage() {
 
               {selectedTheme && (
                 <div className="mb-4 p-4 rounded-2xl" style={{ backgroundColor: 'rgba(183, 207, 63, 0.15)' }}>
-                  <p className="text-sm font-medium" style={{ color: '#1A0089' }}>
+                  <p className="text-sm font-medium" style={{ color: '#0b4e9d' }}>
                     ✓ 10 questions loaded. Feel free to edit or add more below!
                   </p>
                 </div>
@@ -553,7 +553,7 @@ export default function CheckoutPage() {
                   type="button"
                   onClick={() => append({ id: Date.now().toString(), text: '' })}
                   className="mt-3 text-sm font-medium hover:opacity-70 transition"
-                  style={{ color: '#1A0089' }}
+                  style={{ color: '#0b4e9d' }}
                 >
                   + Add Another Question
                 </button>
@@ -562,7 +562,7 @@ export default function CheckoutPage() {
 
             {/* Additional Notes */}
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#1A0089' }}>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
                 Additional Notes (Optional)
               </label>
               <textarea
@@ -576,12 +576,12 @@ export default function CheckoutPage() {
 
             {/* Summary */}
             <div className="p-8 rounded-2xl" style={{ backgroundColor: 'rgba(150, 173, 217, 0.15)' }}>
-              <h3 className="font-bold font-serif text-xl mb-3" style={{ color: '#1A0089' }}>Order Summary</h3>
+              <h3 className="font-bold font-serif text-xl mb-3" style={{ color: '#0b4e9d' }}>Order Summary</h3>
               <div className="flex justify-between items-center">
-                <span className="text-lg" style={{ color: '#1A0089' }}>
+                <span className="text-lg" style={{ color: '#0b4e9d' }}>
                   {lengthMinutes}-minute interview session
                 </span>
-                <span className="text-3xl font-bold font-serif" style={{ color: '#1A0089' }}>{getPrice()}</span>
+                <span className="text-3xl font-bold font-serif" style={{ color: '#0b4e9d' }}>{getPrice()}</span>
               </div>
             </div>
 
@@ -590,7 +590,7 @@ export default function CheckoutPage() {
               type="submit"
               disabled={isSubmitting}
               className="w-full text-white py-4 rounded-full font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-              style={{ backgroundColor: '#1A0089' }}
+              style={{ backgroundColor: '#0b4e9d' }}
             >
               {isSubmitting ? 'Processing...' : 'Proceed to Payment'}
             </button>
