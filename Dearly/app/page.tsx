@@ -30,22 +30,23 @@ export default function HomePage() {
                 className="transition-transform duration-300 group-hover:scale-105"
               />
             </div>
-            <Link
-              href="/login"
-              className="text-sm font-medium hover:opacity-70 transition-all duration-300 hover:translate-x-1"
-              style={{ color: '#0b4e9d' }}
-            >
-              Admin Login
-            </Link>
           </nav>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-6 py-16 md:py-24 relative">
-        {/* Heart image - moved up and left with slight clockwise rotation */}
-        <div className="absolute bottom-40 right-48 md:right-56 transition-transform duration-300 hover:scale-110" style={{ transform: 'rotate(15deg)' }}>
+      <section className="container mx-auto px-6 py-16 md:py-24 relative pb-24 md:pb-32">
+        {/* Heart image - smaller on mobile, larger and positioned on desktop */}
+        <div className="absolute top-8 right-6 md:hidden transition-transform duration-300 hover:scale-110" style={{ transform: 'rotate(15deg)' }}>
+          <Image src="/heart.png" alt="" width={60} height={60} />
+        </div>
+        <div className="hidden md:block absolute bottom-40 right-48 md:right-56 transition-transform duration-300 hover:scale-110" style={{ transform: 'rotate(15deg)' }}>
           <Image src="/heart.png" alt="" width={120} height={120} />
+        </div>
+
+        {/* Mail image - bottom left with counter-clockwise tilt */}
+        <div className="absolute bottom-8 left-20 md:bottom-16 md:left-32 transition-transform duration-300 hover:scale-110" style={{ transform: 'rotate(-12deg)' }}>
+          <Image src="/mail.png" alt="" width={70} height={70} className="md:w-[100px] md:h-[100px]" />
         </div>
 
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
@@ -61,11 +62,11 @@ export default function HomePage() {
       </section>
 
       {/* Feature Section 1 - Problem/Solution */}
-      <section className="container mx-auto px-6 py-16 md:py-24 relative">
+      <section className="container mx-auto px-6 py-24 md:py-32 relative mt-8 md:mt-12">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex justify-center mb-8">
             <div className="transition-transform duration-300 hover:scale-110">
-              <Image src="/mic.png" alt="" width={120} height={120} />
+              <Image src="/mic.png" alt="" width={120} height={120} className="w-20 h-20 md:w-28 md:h-28 lg:w-[120px] lg:h-[120px]" />
             </div>
           </div>
           <h3 className="permanent-marker text-3xl md:text-4xl lg:text-5xl mb-8 leading-tight" style={{ color: '#0b4e9d' }}>
@@ -126,7 +127,7 @@ export default function HomePage() {
       {/* Feature Section 2 - Reversed */}
       <section className="container mx-auto px-6 py-16 md:py-24 relative">
         {/* Hug image - on website background, larger and more left */}
-        <div className="absolute top-[45%] right-0 md:right-32 transform -translate-y-1/2 transition-transform duration-300 hover:scale-110">
+        <div className="hidden lg:block absolute top-[45%] right-0 md:right-32 transform -translate-y-1/2 transition-transform duration-300 hover:scale-110">
           <Image src="/hug.png" alt="" width={250} height={250} />
         </div>
 
@@ -228,12 +229,12 @@ export default function HomePage() {
       <section className="container mx-auto px-6 py-16 md:py-24 relative">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <div className="flex justify-center items-center gap-6 mb-6">
+            <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 mb-6">
               <h3 className="permanent-marker text-3xl md:text-4xl lg:text-5xl leading-tight" style={{ color: '#0b4e9d' }}>
                 Choose your Dearly plan
               </h3>
               <div className="transition-transform duration-300 hover:scale-110">
-                <Image src="/smile.png" alt="" width={80} height={80} />
+                <Image src="/smile.png" alt="" width={80} height={80} className="w-16 h-16 md:w-20 md:h-20" />
               </div>
             </div>
             <p className="text-lg md:text-xl mb-8 opacity-80 max-w-3xl mx-auto" style={{ color: '#0b4e9d' }}>
@@ -362,7 +363,7 @@ export default function HomePage() {
         <div className="max-w-2xl mx-auto text-center">
           <div className="flex justify-center mb-8">
             <div className="transition-transform duration-300 hover:scale-110">
-              <Image src="/hands.png" alt="" width={120} height={120} />
+              <Image src="/hands.png" alt="" width={120} height={120} className="w-20 h-20 md:w-28 md:h-28 lg:w-[120px] lg:h-[120px]" />
             </div>
           </div>
           <h3 className="permanent-marker text-4xl md:text-5xl mb-6" style={{ color: '#0b4e9d' }}>
@@ -384,15 +385,20 @@ export default function HomePage() {
       {/* Food for Thought / Final CTA Section */}
       <section className="container mx-auto px-6 py-16 md:py-24 relative">
         <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-          <div className="relative h-96 flex items-center justify-center">
+          <div className="relative h-64 md:h-96 hidden md:flex items-center justify-center">
             <div className="transition-transform duration-300 hover:scale-110">
-              <Image src="/mail.png" alt="" width={180} height={180} />
+              <Image src="/mail.png" alt="" width={180} height={180} className="w-40 h-40 lg:w-[180px] lg:h-[180px]" />
             </div>
           </div>
           <div>
-            <h3 className="permanent-marker text-3xl md:text-4xl mb-6" style={{ color: '#0b4e9d' }}>
-              A moment to reflect
-            </h3>
+            <div className="flex flex-col md:block items-center md:items-start text-center md:text-left">
+              <h3 className="permanent-marker text-3xl md:text-4xl mb-6" style={{ color: '#0b4e9d' }}>
+                A moment to reflect
+              </h3>
+              <div className="md:hidden mb-6 transition-transform duration-300 hover:scale-110">
+                <Image src="/mail.png" alt="" width={120} height={120} />
+              </div>
+            </div>
             <p className="text-lg mb-4 opacity-80" style={{ color: '#0b4e9d' }}>
               When was the last time you asked your loved ones about their childhood? Their first love? The moments that changed everything?
             </p>
