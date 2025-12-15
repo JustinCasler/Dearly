@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import Stripe from 'stripe'
+import crypto from 'crypto'
 
 /**
  * Manual endpoint to process a Stripe checkout session
@@ -12,7 +13,7 @@ import Stripe from 'stripe'
  */
 export async function POST(req: NextRequest) {
   try {
-    const { sessionId, questionnaireEncoded } = await req.json()
+    const { sessionId, questionnaireEncoded, slotId, timezone } = await req.json()
 
     if (!sessionId) {
       return NextResponse.json(
@@ -163,14 +164,85 @@ export async function POST(req: NextRequest) {
       package_name: packageName,
     } as any)
 
-    // Payment successful - user will be redirected to booking page
+    // If slot was selected, create the appointment and generate tokens
+    let managementToken = null
+    let bookingToken = null
+
+    if (slotId) {
+      // Get the availability slot details to get start_time and end_time
+      const { data: slot, error: slotError } = await supabaseAdmin
+        .from('availability_slots')
+        .select('start_time, end_time')
+        .eq('id', slotId)
+        .single()
+
+      if (slotError || !slot) {
+        console.error('Error fetching availability slot:', slotError)
+        throw new Error('Availability slot not found')
+      }
+
+      // Generate booking token for appointment management
+      bookingToken = crypto.randomBytes(32).toString('hex')
+
+      // Create appointment
+      const { data: appointment, error: appointmentError } = await supabaseAdmin
+        .from('appointments')
+        .insert({
+          session_id: (sessionRecord as any).id,
+          user_id: userId,
+          availability_slot_id: slotId,
+          start_time: (slot as any).start_time,
+          end_time: (slot as any).end_time,
+          status: 'scheduled',
+          timezone: timezone || 'UTC',
+          booking_token: bookingToken,
+        } as any)
+        .select()
+        .single()
+
+      if (appointmentError) {
+        console.error('Error creating appointment:', appointmentError)
+        throw appointmentError
+      }
+
+      // Update session status to scheduled
+      await (supabaseAdmin.from('sessions').update as any)({
+        status: 'scheduled',
+      })
+        .eq('id', (sessionRecord as any).id)
+
+      // Mark availability slot as booked
+      await (supabaseAdmin.from('availability_slots').update as any)({
+        is_available: false,
+      })
+        .eq('id', slotId)
+
+      // Generate listening token for management
+      managementToken = crypto.randomBytes(32).toString('hex')
+
+      await (supabaseAdmin as any)
+        .from('listening_tokens')
+        .insert({
+          session_id: (sessionRecord as any).id,
+          token: managementToken,
+        })
+
+      console.log('Appointment created successfully')
+    }
+
+    // Payment successful - user will be redirected to booking page or confirmation
     console.log('Payment processed successfully for:', customerEmail)
-    console.log('Booking link:', `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/booking/${(sessionRecord as any).id}`)
+    if (!slotId) {
+      console.log('Booking link:', `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/booking/${(sessionRecord as any).id}`)
+    } else {
+      console.log('Appointment confirmed')
+    }
 
     return NextResponse.json({
       success: true,
       message: 'Session processed successfully',
       sessionId: (sessionRecord as any).id,
+      token: bookingToken || managementToken,
     })
   } catch (error: any) {
     console.error('Error processing session:', error)

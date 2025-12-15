@@ -8,6 +8,8 @@ function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const questionnaireEncoded = searchParams.get('q')
+  const slotId = searchParams.get('slot_id')
+  const timezone = searchParams.get('timezone')
   const [processing, setProcessing] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [bookingSessionId, setBookingSessionId] = useState<string | null>(null)
@@ -15,6 +17,8 @@ function SuccessContent() {
   useEffect(() => {
     // Clear saved checkout form data since payment was successful
     localStorage.removeItem('dearly_checkout_form')
+    // Also clear pending checkout data if coming from booking flow
+    localStorage.removeItem('dearly_pending_checkout')
   }, [])
 
   useEffect(() => {
@@ -30,7 +34,7 @@ function SuccessContent() {
       return
     }
 
-    // Process the session and redirect to booking
+    // Process the session and create booking if slot was selected
     const processSession = async () => {
       try {
         const response = await fetch('/api/stripe/process-session', {
@@ -38,7 +42,9 @@ function SuccessContent() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sessionId,
-            questionnaireEncoded
+            questionnaireEncoded,
+            slotId,
+            timezone
           }),
         })
 
@@ -48,10 +54,16 @@ function SuccessContent() {
           throw new Error(result.error || 'Failed to process session')
         }
 
-        // Redirect to booking page after a brief delay
         setBookingSessionId(result.sessionId)
+
+        // If booking was created, redirect to confirmation page
+        // Otherwise redirect to booking page to select time
         setTimeout(() => {
-          window.location.href = `/booking/${result.sessionId}`
+          if (slotId) {
+            window.location.href = `/booking/confirmed?token=${result.token}`
+          } else {
+            window.location.href = `/booking/${result.sessionId}`
+          }
         }, 2000)
       } catch (err: any) {
         console.error('Error processing session:', err)
@@ -61,7 +73,7 @@ function SuccessContent() {
     }
 
     processSession()
-  }, [sessionId, questionnaireEncoded])
+  }, [sessionId, questionnaireEncoded, slotId, timezone])
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f4f1ea' }}>

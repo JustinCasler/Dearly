@@ -9,19 +9,23 @@ function BookingConfirmedContent() {
   const searchParams = useSearchParams()
   const bookingToken = searchParams.get('token')
   const [copied, setCopied] = useState(false)
+  const [manageUrl, setManageUrl] = useState('')
 
   useEffect(() => {
     if (!bookingToken) {
       router.push('/')
+    } else {
+      // Set manage URL on client side only
+      setManageUrl(`${window.location.origin}/booking/manage/${bookingToken}`)
     }
   }, [bookingToken, router])
 
-  const manageUrl = `${window.location.origin}/booking/manage/${bookingToken}`
-
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(manageUrl)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    if (manageUrl) {
+      navigator.clipboard.writeText(manageUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   return (
@@ -75,35 +79,6 @@ function BookingConfirmedContent() {
                 After the interview, we'll edit and deliver your video recording
               </li>
             </ul>
-          </div>
-
-          {/* Manage Booking Link */}
-          <div className="rounded-2xl p-4 mb-6" style={{ backgroundColor: 'rgba(11, 78, 157, 0.05)', border: '2px solid rgba(11, 78, 157, 0.2)' }}>
-            <p className="text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
-              Need to reschedule or cancel?
-            </p>
-            <p className="text-sm mb-3 opacity-70" style={{ color: '#0b4e9d' }}>
-              Save this link to manage your booking:
-            </p>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={manageUrl}
-                readOnly
-                className="flex-1 px-3 py-2 text-sm bg-white border-2 rounded-xl focus:outline-none"
-                style={{ borderColor: 'rgba(11, 78, 157, 0.2)', color: '#0b4e9d' }}
-              />
-              <button
-                onClick={copyToClipboard}
-                className="px-4 py-2 text-white text-sm rounded-xl transition-all duration-300 hover:shadow-lg"
-                style={{ backgroundColor: '#0b4e9d' }}
-              >
-                {copied ? 'Copied!' : 'Copy'}
-              </button>
-            </div>
-            <p className="text-xs mt-2 opacity-60" style={{ color: '#0b4e9d' }}>
-              This link was also sent to your email
-            </p>
           </div>
 
           {/* Action Buttons */}

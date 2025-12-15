@@ -49,10 +49,10 @@ export default function BookingPage() {
 
       const sessionData = (sessionResult as any).data
 
-      // Check if session is paid (not already scheduled)
-      if ((sessionData as any).status !== 'paid') {
-        console.error('Session not in paid status:', (sessionData as any).status)
-        setError('This session is not eligible for booking. It may already be scheduled.')
+      // Check if session is paid or scheduled (for rescheduling)
+      if ((sessionData as any).status !== 'paid' && (sessionData as any).status !== 'scheduled') {
+        console.error('Session not in valid status:', (sessionData as any).status)
+        setError('This session is not eligible for booking.')
         return
       }
 

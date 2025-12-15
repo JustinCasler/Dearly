@@ -207,7 +207,14 @@ export default function ManageBooking() {
 
             {/* Actions */}
             {appointment.status === 'scheduled' && !isPast && (
-              <div className="mt-6">
+              <div className="mt-6 space-y-3">
+                <button
+                  onClick={() => router.push(`/booking/${appointment.session_id}`)}
+                  className="w-full px-6 py-3 text-white rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                  style={{ backgroundColor: '#0b4e9d' }}
+                >
+                  Reschedule Appointment
+                </button>
                 <button
                   onClick={handleCancel}
                   disabled={processing}

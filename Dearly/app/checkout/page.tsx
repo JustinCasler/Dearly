@@ -172,6 +172,12 @@ export default function CheckoutPage() {
       setValidationError('Please enter your email')
       return
     }
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setValidationError('Please enter a valid email address')
+      return
+    }
     if (!intervieweeName || intervieweeName.trim() === '') {
       setValidationError('Please enter the interviewee\'s name')
       return
@@ -208,38 +214,40 @@ export default function CheckoutPage() {
   }
 
   const onSubmit = async (data: QuestionnaireFormData) => {
+    console.log('Form submitted with data:', data)
     setIsSubmitting(true)
     setError(null)
 
     try {
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          length_minutes: data.length_minutes,
-          questionnaire: {
-            relationship_to_interviewee: data.relationship_to_interviewee,
-            interviewee_name: data.interviewee_name,
-            questions: data.questions,
-            medium: data.medium,
-            notes: data.notes,
-          },
-        }),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to create checkout session')
+      // Validate that all questions are filled in
+      const emptyQuestions = data.questions.filter(q => !q.text || q.text.trim() === '')
+      if (emptyQuestions.length > 0) {
+        setError('Please fill in all question fields or remove empty questions')
+        setIsSubmitting(false)
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+        return
       }
 
-      // Redirect to Stripe Checkout
-      if (result.url) {
-        // Don't clear localStorage yet - user might come back from Stripe
-        window.location.href = result.url
+      // Save complete checkout data to localStorage
+      const checkoutData = {
+        name: data.name,
+        email: data.email,
+        length_minutes: data.length_minutes,
+        questionnaire: {
+          relationship_to_interviewee: data.relationship_to_interviewee,
+          interviewee_name: data.interviewee_name,
+          questions: data.questions,
+          medium: data.medium,
+          notes: data.notes,
+        },
       }
+
+      console.log('Saving checkout data to localStorage:', checkoutData)
+      localStorage.setItem('dearly_pending_checkout', JSON.stringify(checkoutData))
+
+      console.log('Redirecting to /booking/session')
+      // Redirect to booking selection page
+      router.push('/booking/session')
     } catch (err) {
       console.error('Checkout error:', err)
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -456,23 +464,25 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Validation Error for Step 1 */}
-            {validationError && (
-              <div className="text-sm text-red-700 text-center py-2">
-                {validationError}
-              </div>
-            )}
-
             {/* Next Button for Step 1 */}
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={handleNextStep}
-                className="px-8 py-4 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 text-lg"
-                style={{ backgroundColor: '#0b4e9d' }}
-              >
-                Continue to Questions →
-              </button>
+            <div className="space-y-4">
+              {/* Validation Error */}
+              {validationError && (
+                <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 text-center">
+                  <p className="text-red-600 font-medium">{validationError}</p>
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleNextStep}
+                  className="px-8 py-4 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 text-lg"
+                  style={{ backgroundColor: '#0b4e9d' }}
+                >
+                  Continue to Questions →
+                </button>
+              </div>
             </div>
             </>
             )}
@@ -750,14 +760,23 @@ export default function CheckoutPage() {
             </div>
 
             {/* Submit Button for Step 2 */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full text-white py-4 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-              style={{ backgroundColor: '#0b4e9d' }}
-            >
-              {isSubmitting ? 'Processing...' : 'Proceed to Payment'}
-            </button>
+            <div className="space-y-4">
+              {/* Validation Error */}
+              {error && (
+                <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 text-center">
+                  <p className="text-red-600 font-medium">{error}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full text-white py-4 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                style={{ backgroundColor: '#0b4e9d' }}
+              >
+                {isSubmitting ? 'Loading...' : 'Continue to Select Interview Time'}
+              </button>
+            </div>
             </>
             )}
           </form>

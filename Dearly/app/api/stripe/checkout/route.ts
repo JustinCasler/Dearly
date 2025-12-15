@@ -8,7 +8,9 @@ export async function POST(req: NextRequest) {
       name,
       email,
       length_minutes,
-      questionnaire
+      questionnaire,
+      slot_id,
+      timezone
     } = body
 
     if (!name || !email || !length_minutes || !questionnaire) {
@@ -22,6 +24,17 @@ export async function POST(req: NextRequest) {
 
     // Encode the full questionnaire as base64 to pass in URL
     const questionnaireEncoded = Buffer.from(JSON.stringify(questionnaire)).toString('base64url')
+
+    // Build success URL with optional booking parameters
+    let successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}&q=${questionnaireEncoded}`
+
+    if (slot_id) {
+      successUrl += `&slot_id=${slot_id}`
+    }
+
+    if (timezone) {
+      successUrl += `&timezone=${encodeURIComponent(timezone)}`
+    }
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -40,14 +53,18 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}&q=${questionnaireEncoded}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
+      success_url: successUrl,
+      cancel_url: slot_id
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/booking/session`
+        : `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
       customer_email: email,
       metadata: {
         customer_name: name,
         customer_email: email,
         length_minutes: length_minutes.toString(),
         interviewee_name: questionnaire.interviewee_name,
+        ...(slot_id && { slot_id }),
+        ...(timezone && { timezone }),
       },
       // Customize the checkout page appearance
       custom_text: {
