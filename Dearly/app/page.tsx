@@ -501,8 +501,8 @@ export default function HomePage() {
                 <h4 className="text-xl font-semibold mb-4 text-white">Contact Us</h4>
                 <ul className="flex flex-col gap-3 text-white opacity-80">
                   <li>
-                    <a href="mailto:hello@dearly.com" className="hover:opacity-100 transition-opacity">
-                      hello@dearly.com
+                    <a href="mailto:dearlystories@gmail.com" className="hover:opacity-100 transition-opacity">
+                      dearlystories@gmail.com
                     </a>
                   </li>
                   <li className="mt-2">

@@ -427,9 +427,9 @@ export default function CheckoutPage() {
                     className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
                     style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                   >
-                    <option value={30}>Dearly Essential (30 min) - $99 - Perfect for quick life stories</option>
-                    <option value={60}>Dearly Gift (60 min) - $139 - Most popular, deep conversations</option>
-                    <option value={90}>Dearly Legacy (90 min) - $199 - Comprehensive family history</option>
+                    <option value={30}>Dearly Essential - $99 - Interview with edited audio</option>
+                    <option value={60}>Dearly Gift - $139 - Essential + transcript + mini bio</option>
+                    <option value={90}>Dearly Legacy - $199 - Gift + free family interview + e-book access</option>
                   </select>
                   {errors.length_minutes && (
                     <p className="mt-1 text-sm" style={{ color: '#FF5E33' }}>{errors.length_minutes.message}</p>
@@ -604,15 +604,39 @@ export default function CheckoutPage() {
 
               <div className="space-y-3 md:space-y-4">
                 {fields.map((field, index) => (
-                  <div key={field.id} className="question-card p-4 md:p-5 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow border-2" style={{ borderColor: 'rgba(26, 0, 137, 0.1)' }}>
-                    <div className="flex items-start gap-3">
-                      <label className="block text-sm md:text-base font-medium mb-2 flex-shrink-0" style={{ color: '#0b4e9d' }}>
-                        Q{index + 1}
+                  <div key={field.id}>
+                    {/* Mobile: Label and icon on top */}
+                    <div className="flex items-center justify-between mb-2 md:hidden">
+                      <label className="block text-sm font-medium" style={{ color: '#0b4e9d' }}>
+                        Question {index + 1}
+                      </label>
+                      {fields.length > 3 && (
+                        <button
+                          type="button"
+                          onClick={() => remove(index)}
+                          className="p-2 transition hover:opacity-70"
+                          aria-label="Remove question"
+                        >
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF5E33" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Desktop: Horizontal layout */}
+                    <div className="hidden md:flex md:items-start md:gap-3">
+                      <label className="block text-sm font-medium pt-3" style={{ color: '#0b4e9d' }}>
+                        Question {index + 1}
                       </label>
                       <div className="flex-1">
                         <textarea
                           {...register(`questions.${index}.text`)}
-                          className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-opacity-100 transition resize-y min-h-[80px] text-base leading-relaxed"
+                          rows={3}
+                          className="w-full px-3 py-2 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition resize-y overflow-hidden"
                           style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                           placeholder={`Enter question ${index + 1}...`}
                         />
@@ -626,11 +650,27 @@ export default function CheckoutPage() {
                         <button
                           type="button"
                           onClick={() => remove(index)}
-                          className="px-3 py-2 rounded-lg transition hover:opacity-70 flex-shrink-0 min-h-[44px] text-sm md:text-base"
+                          className="px-4 py-2 rounded-2xl transition hover:opacity-70"
                           style={{ color: '#FF5E33', backgroundColor: 'rgba(255, 94, 51, 0.1)' }}
                         >
                           Remove
                         </button>
+                      )}
+                    </div>
+
+                    {/* Mobile: Full width textarea */}
+                    <div className="md:hidden">
+                      <textarea
+                        {...register(`questions.${index}.text`)}
+                        rows={3}
+                        className="w-full px-3 py-2 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition resize-y overflow-hidden"
+                        style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
+                        placeholder={`Enter question ${index + 1}...`}
+                      />
+                      {errors.questions?.[index]?.text && (
+                        <p className="mt-1 text-sm" style={{ color: '#FF5E33' }}>
+                          {errors.questions[index]?.text?.message}
+                        </p>
                       )}
                     </div>
                   </div>
