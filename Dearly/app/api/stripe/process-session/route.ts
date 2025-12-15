@@ -147,6 +147,9 @@ export async function POST(req: NextRequest) {
       } as any)
     }
 
+    // Determine package name based on length
+    const packageName = lengthMinutes === 30 ? 'Essential' : lengthMinutes === 90 ? 'Legacy' : 'Gift'
+
     // Create questionnaire record
     await supabaseAdmin.from('questionnaires').insert({
       session_id: (sessionRecord as any).id,
@@ -157,6 +160,7 @@ export async function POST(req: NextRequest) {
       length_minutes: lengthMinutes,
       medium: questionnaire.medium,
       notes: questionnaire.notes || null,
+      package_name: packageName,
     } as any)
 
     // Payment successful - user will be redirected to booking page

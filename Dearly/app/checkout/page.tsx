@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { questionnaireSchema, QuestionnaireFormData } from '@/lib/validations'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+
+const FORM_STORAGE_KEY = 'dearly_checkout_form'
 
 const THEME_QUESTIONS = {
   'life-story': [
@@ -90,6 +92,45 @@ export default function CheckoutPage() {
     control,
     name: 'questions',
   })
+
+  // Load saved form data on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem(FORM_STORAGE_KEY)
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData)
+        // Restore all form fields
+        Object.keys(parsedData).forEach((key) => {
+          if (key === 'questions') {
+            replace(parsedData[key])
+          } else {
+            setValue(key as any, parsedData[key])
+          }
+        })
+        // Restore theme selection if it exists
+        if (parsedData.selectedTheme) {
+          setSelectedTheme(parsedData.selectedTheme)
+        }
+        // Restore current step
+        if (parsedData.currentStep) {
+          setCurrentStep(parsedData.currentStep)
+        }
+      } catch (err) {
+        console.error('Failed to restore form data:', err)
+      }
+    }
+  }, [setValue, replace])
+
+  // Save form data to localStorage whenever it changes
+  const formValues = watch()
+  useEffect(() => {
+    const dataToSave = {
+      ...formValues,
+      selectedTheme,
+      currentStep,
+    }
+    localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(dataToSave))
+  }, [formValues, selectedTheme, currentStep])
 
   const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme)
@@ -196,12 +237,20 @@ export default function CheckoutPage() {
 
       // Redirect to Stripe Checkout
       if (result.url) {
+        // Don't clear localStorage yet - user might come back from Stripe
         window.location.href = result.url
       }
     } catch (err) {
       console.error('Checkout error:', err)
       setError(err instanceof Error ? err.message : 'An error occurred')
       setIsSubmitting(false)
+    }
+  }
+
+  const clearFormData = () => {
+    if (confirm('Are you sure you want to clear all form data and start over?')) {
+      localStorage.removeItem(FORM_STORAGE_KEY)
+      window.location.reload()
     }
   }
 
@@ -214,16 +263,41 @@ export default function CheckoutPage() {
     }
   }
 
+  const getPackageName = () => {
+    switch (lengthMinutes) {
+      case 30: return 'Essential'
+      case 60: return 'Gift'
+      case 90: return 'Legacy'
+      default: return 'Gift'
+    }
+  }
+
+  const getPackageDescription = () => {
+    switch (lengthMinutes) {
+      case 30: return '30-minute professional interview'
+      case 60: return '60-minute comprehensive interview with transcript'
+      case 90: return '90-minute complete life story with mini biography'
+      default: return '60-minute comprehensive interview with transcript'
+    }
+  }
+
   return (
     <div className="min-h-screen py-12" style={{ backgroundColor: '#f4f1ea' }}>
       <div className="container mx-auto px-4 max-w-3xl">
-        <div className="mb-8">
+        <div className="mb-8 flex justify-between items-center">
           <button
             onClick={handleBackButton}
             className="hover:opacity-70 transition"
             style={{ color: '#0b4e9d' }}
           >
             ← {currentStep === 2 ? 'Back' : 'Back to Home'}
+          </button>
+          <button
+            onClick={clearFormData}
+            className="text-sm hover:opacity-70 transition"
+            style={{ color: '#0b4e9d' }}
+          >
+            Clear Form
           </button>
         </div>
 
@@ -346,16 +420,16 @@ export default function CheckoutPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
-                    Session Length *
+                    Select Your Package *
                   </label>
                   <select
                     {...register('length_minutes', { valueAsNumber: true })}
                     className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
                     style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                   >
-                    <option value={30}>30 minutes - $99</option>
-                    <option value={60}>60 minutes - $139</option>
-                    <option value={90}>90 minutes - $199</option>
+                    <option value={30}>Dearly Essential (30 min) - $99 - Perfect for quick life stories</option>
+                    <option value={60}>Dearly Gift (60 min) - $139 - Most popular, deep conversations</option>
+                    <option value={90}>Dearly Legacy (90 min) - $199 - Comprehensive family history</option>
                   </select>
                   {errors.length_minutes && (
                     <p className="mt-1 text-sm" style={{ color: '#FF5E33' }}>{errors.length_minutes.message}</p>
@@ -407,11 +481,6 @@ export default function CheckoutPage() {
             {currentStep === 2 && (
               <>
             <div>
-              <h2 className="text-2xl font-bold mb-2" style={{ color: '#0b4e9d' }}>Interview Questions</h2>
-              <p className="text-sm mb-4 opacity-70" style={{ color: '#0b4e9d' }}>
-                Choose a theme to get pre-populated questions, or create your own custom questions.
-              </p>
-
               {/* Theme Selector */}
               <div className="mb-6">
                 <label className="block text-sm font-medium mb-3" style={{ color: '#0b4e9d' }}>
@@ -513,33 +582,57 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              <div className="space-y-3">
+              {/* Question Limit Indicator */}
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold" style={{ color: '#0b4e9d' }}>
+                  Your Questions
+                </h3>
+                <span className="text-sm font-medium" style={{
+                  color: fields.length > 12 ? '#FF5E33' : '#0b4e9d'
+                }}>
+                  {fields.length} / 12 questions
+                  {fields.length > 12 && (
+                    <span className="block text-xs text-red-600 mt-1">
+                      Maximum 12 recommended
+                    </span>
+                  )}
+                </span>
+              </div>
+              <p className="text-sm opacity-70 mb-4" style={{ color: '#0b4e9d' }}>
+                Select up to 12 questions for your interview. You can customize or remove any pre-populated questions.
+              </p>
+
+              <div className="space-y-3 md:space-y-4">
                 {fields.map((field, index) => (
-                  <div key={field.id} className="flex gap-2">
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        {...register(`questions.${index}.text`)}
-                        className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
-                        style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
-                        placeholder={`Question ${index + 1}`}
-                      />
-                      {errors.questions?.[index]?.text && (
-                        <p className="mt-1 text-sm" style={{ color: '#FF5E33' }}>
-                          {errors.questions[index]?.text?.message}
-                        </p>
+                  <div key={field.id} className="question-card p-4 md:p-5 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow border-2" style={{ borderColor: 'rgba(26, 0, 137, 0.1)' }}>
+                    <div className="flex items-start gap-3">
+                      <label className="block text-sm md:text-base font-medium mb-2 flex-shrink-0" style={{ color: '#0b4e9d' }}>
+                        Q{index + 1}
+                      </label>
+                      <div className="flex-1">
+                        <textarea
+                          {...register(`questions.${index}.text`)}
+                          className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-opacity-100 transition resize-y min-h-[80px] text-base leading-relaxed"
+                          style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
+                          placeholder={`Enter question ${index + 1}...`}
+                        />
+                        {errors.questions?.[index]?.text && (
+                          <p className="mt-1 text-sm" style={{ color: '#FF5E33' }}>
+                            {errors.questions[index]?.text?.message}
+                          </p>
+                        )}
+                      </div>
+                      {fields.length > 3 && (
+                        <button
+                          type="button"
+                          onClick={() => remove(index)}
+                          className="px-3 py-2 rounded-lg transition hover:opacity-70 flex-shrink-0 min-h-[44px] text-sm md:text-base"
+                          style={{ color: '#FF5E33', backgroundColor: 'rgba(255, 94, 51, 0.1)' }}
+                        >
+                          Remove
+                        </button>
                       )}
                     </div>
-                    {fields.length > 3 && (
-                      <button
-                        type="button"
-                        onClick={() => remove(index)}
-                        className="px-3 py-2 rounded-2xl transition hover:opacity-70"
-                        style={{ color: '#FF5E33', backgroundColor: 'rgba(255, 94, 51, 0.1)' }}
-                      >
-                        Remove
-                      </button>
-                    )}
                   </div>
                 ))}
               </div>
@@ -576,12 +669,43 @@ export default function CheckoutPage() {
 
             {/* Summary */}
             <div className="p-8 rounded-2xl" style={{ backgroundColor: 'rgba(150, 173, 217, 0.15)' }}>
-              <h3 className="font-bold text-xl mb-3" style={{ color: '#0b4e9d' }}>Order Summary</h3>
-              <div className="flex justify-between items-center">
-                <span className="text-lg" style={{ color: '#0b4e9d' }}>
-                  {lengthMinutes}-minute interview session
-                </span>
-                <span className="text-3xl font-bold font-serif" style={{ color: '#0b4e9d' }}>{getPrice()}</span>
+              <h3 className="font-bold text-xl mb-4" style={{ color: '#0b4e9d' }}>Order Summary</h3>
+
+              {/* Package Info */}
+              <div className="mb-4 pb-4 border-b" style={{ borderColor: 'rgba(11, 78, 157, 0.2)' }}>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="font-semibold text-lg" style={{ color: '#0b4e9d' }}>
+                      Dearly {getPackageName()}
+                    </p>
+                    <p className="text-sm opacity-70" style={{ color: '#0b4e9d' }}>
+                      {getPackageDescription()}
+                    </p>
+                  </div>
+                  <span className="text-2xl font-bold font-serif flex-shrink-0 ml-4" style={{ color: '#0b4e9d' }}>
+                    {getPrice()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Interview Details */}
+              <div className="space-y-2">
+                <div>
+                  <p className="text-xs uppercase tracking-wide opacity-60 mb-1" style={{ color: '#0b4e9d' }}>
+                    Interviewee
+                  </p>
+                  <p className="font-medium" style={{ color: '#0b4e9d' }}>
+                    {watch('interviewee_name') || 'Not specified'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-wide opacity-60 mb-1" style={{ color: '#0b4e9d' }}>
+                    Relationship
+                  </p>
+                  <p className="font-medium" style={{ color: '#0b4e9d' }}>
+                    {watch('relationship_to_interviewee') || 'Not specified'}
+                  </p>
+                </div>
               </div>
             </div>
 

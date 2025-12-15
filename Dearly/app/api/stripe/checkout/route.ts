@@ -49,6 +49,14 @@ export async function POST(req: NextRequest) {
         length_minutes: length_minutes.toString(),
         interviewee_name: questionnaire.interviewee_name,
       },
+      // Customize the checkout page appearance
+      custom_text: {
+        submit: {
+          message: 'Secure your family legacy today',
+        },
+      },
+      // Add billing address collection
+      billing_address_collection: 'auto',
     })
 
     return NextResponse.json({ sessionId: session.id, url: session.url })

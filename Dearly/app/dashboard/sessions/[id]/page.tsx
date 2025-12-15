@@ -14,8 +14,10 @@ import {
   assignSessionToSelf,
   SessionWithDetails
 } from '@/app/actions/sessions'
+import { deliverRecording } from '@/app/actions/recordings'
 import Link from 'next/link'
 import AssignmentBadge from '@/components/AssignmentBadge'
+import FileUploadForm from '@/components/FileUploadForm'
 
 type SessionDetails = {
   session: {
@@ -23,6 +25,9 @@ type SessionDetails = {
     status: string
     amount: number
     recording_url: string | null
+    audio_storage_path: string | null
+    transcript_storage_path: string | null
+    processing_status: string | null
     appointment_id: string | null
     appointment_start_time: string | null
     appointment_end_time: string | null
@@ -294,38 +299,76 @@ export default function SessionDetailPage() {
             </div>
           </div>
 
-          {/* Recording Upload */}
-          {session.status !== 'delivered' && (
+          {/* Recording Upload - New File Upload System */}
+          {session.status !== 'delivered' && !session.audio_storage_path && (
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">Upload Recording</h2>
-              <form onSubmit={handleSubmit(onSubmitRecording)} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Recording URL
-                  </label>
-                  <input
-                    type="url"
-                    {...register('recording_url')}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="https://example.com/recording.mp3"
-                  />
-                  {errors.recording_url && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.recording_url.message}
-                    </p>
-                  )}
-                  <p className="mt-1 text-sm text-gray-500">
-                    This will automatically send the recording link to the customer
-                  </p>
-                </div>
-                <button
-                  type="submit"
-                  disabled={uploading}
-                  className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {uploading ? 'Uploading...' : 'Upload & Send to Customer'}
-                </button>
-              </form>
+              <h2 className="text-xl font-semibold mb-4" style={{ color: '#0b4e9d' }}>
+                Upload Recording
+              </h2>
+              <p className="text-sm mb-6" style={{ color: '#737373' }}>
+                Upload both the audio recording and transcript file. Our AI will automatically process
+                the transcript and match it to the interview questions.
+              </p>
+              <FileUploadForm sessionId={sessionId} onUploadComplete={loadSessionDetails} />
+            </div>
+          )}
+
+          {/* Processing Status */}
+          {session.audio_storage_path && session.processing_status && session.processing_status !== 'ready' && (
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold mb-4" style={{ color: '#0b4e9d' }}>
+                Processing Status
+              </h2>
+              <div className={`p-4 rounded-lg border-2 ${
+                session.processing_status === 'failed' ? 'bg-red-50' : 'bg-blue-50'
+              }`} style={{
+                borderColor: session.processing_status === 'failed' ? '#FF5E33' : '#0b4e9d'
+              }}>
+                <p className="font-semibold text-lg capitalize" style={{
+                  color: session.processing_status === 'failed' ? '#FF5E33' : '#0b4e9d'
+                }}>
+                  {session.processing_status}
+                </p>
+                <p className="text-sm mt-2" style={{ color: '#737373' }}>
+                  {session.processing_status === 'uploading' && 'Files are being uploaded to secure storage...'}
+                  {session.processing_status === 'processing' && 'AI is analyzing the transcript and matching segments to questions...'}
+                  {session.processing_status === 'failed' && 'Processing failed. Please try uploading the files again.'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Deliver to Customer */}
+          {session.processing_status === 'ready' && session.status !== 'delivered' && (
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold mb-4" style={{ color: '#0b4e9d' }}>
+                Ready to Deliver
+              </h2>
+              <p className="text-sm mb-4" style={{ color: '#737373' }}>
+                The recording has been processed and is ready to be delivered to the customer.
+                This will send an email with a secure listening link.
+              </p>
+              <button
+                onClick={async () => {
+                  setUploading(true)
+                  const result = await deliverRecording(sessionId)
+                  if (result.success) {
+                    setSuccess('Recording delivered successfully!')
+                    loadSessionDetails()
+                  } else {
+                    setError(result.error || 'Failed to deliver recording')
+                  }
+                  setUploading(false)
+                }}
+                disabled={uploading}
+                className="px-6 py-3 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg"
+                style={{
+                  backgroundColor: uploading ? '#cccccc' : '#B7CF3F',
+                  color: '#0b4e9d'
+                }}
+              >
+                {uploading ? 'Sending...' : 'Deliver to Customer'}
+              </button>
             </div>
           )}
 

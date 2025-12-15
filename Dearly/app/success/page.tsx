@@ -13,6 +13,11 @@ function SuccessContent() {
   const [bookingSessionId, setBookingSessionId] = useState<string | null>(null)
 
   useEffect(() => {
+    // Clear saved checkout form data since payment was successful
+    localStorage.removeItem('dearly_checkout_form')
+  }, [])
+
+  useEffect(() => {
     if (!sessionId) {
       setError('No session ID found in URL')
       setProcessing(false)

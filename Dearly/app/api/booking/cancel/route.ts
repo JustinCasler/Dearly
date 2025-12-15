@@ -90,19 +90,21 @@ export async function POST(request: NextRequest) {
 
     // Send cancellation confirmation email
     if ((appointment as any).users) {
+      const cancelledTime = new Date((appointment as any).start_time).toLocaleString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZone: (appointment as any).timezone || 'America/New_York'
+      })
+
       const cancellationEmail = `
         <h1>Appointment Cancelled</h1>
         <p>Hi ${(appointment as any).users.name},</p>
-        <p>Your interview scheduled for ${new Date((appointment as any).start_time).toLocaleString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          timeZone: 'America/New_York'
-        })} EST has been cancelled.</p>
-        <p>You can reschedule anytime by visiting your booking page:</p>
+        <p>Your interview scheduled for ${cancelledTime} has been cancelled.</p>
+        <p>You can book a new time anytime by visiting your booking page:</p>
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/booking/${(appointment as any).session_id}">Book a New Time</a></p>
         <p>If you have any questions, please don't hesitate to reach out.</p>
         <p>Best,<br/>The Dearly Team</p>

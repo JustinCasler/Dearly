@@ -17,6 +17,13 @@ export default function BookingPage() {
   const [loading, setLoading] = useState(true)
   const [booking, setBooking] = useState(false)
   const [error, setError] = useState('')
+  const [userTimezone, setUserTimezone] = useState<string>('')
+
+  useEffect(() => {
+    // Detect user's timezone
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    setUserTimezone(timezone)
+  }, [])
 
   useEffect(() => {
     validateSessionAndFetchData()
@@ -86,6 +93,7 @@ export default function BookingPage() {
         body: JSON.stringify({
           session_id: sessionId,
           slot_id: selectedSlot,
+          timezone: userTimezone || 'UTC',
         }),
       })
 
@@ -151,7 +159,7 @@ export default function BookingPage() {
             Schedule Your Interview
           </h1>
           <p className="text-lg opacity-70" style={{ color: '#0b4e9d' }}>
-            Select a time that works best for you. All times are shown in Eastern Time (EST).
+            Select a time that works best for you. {userTimezone && `All times are shown in your local timezone (${userTimezone}).`}
           </p>
         </div>
 
