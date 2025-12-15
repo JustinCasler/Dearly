@@ -6,6 +6,9 @@ import { useEffect, useState } from 'react'
 
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false)
+  const [email, setEmail] = useState<string>('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState('')
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +18,35 @@ export default function HomePage() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitMessage('')
+
+    try {
+      const response = await fetch('/api/email-signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setSubmitMessage('Thank you for subscribing!')
+        setEmail('')
+      } else {
+        setSubmitMessage(data.error || 'Something went wrong')
+      }
+    } catch (error) {
+      setSubmitMessage('Failed to subscribe. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f4f1ea' }}>
       {/* Header */}
@@ -30,6 +62,9 @@ export default function HomePage() {
                 className="transition-transform duration-300 group-hover:scale-105"
               />
             </div>
+            <Link href="/checkout" className="font-semibold hover:opacity-70 transition-all duration-300 text-sm md:text-base" style={{ color: '#0b4e9d' }}>
+              Book an interview
+            </Link>
           </nav>
         </div>
       </header>
@@ -248,7 +283,7 @@ export default function HomePage() {
             <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col hover:-translate-y-2">
               <div className="text-center mb-6">
                 <h4 className="text-3xl font-semibold mb-2" style={{ color: '#0b4e9d' }}>Dearly Essential</h4>
-                <div className="text-5xl font-bold mb-2" style={{ color: '#0b4e9d' }}>$99</div>
+                <div className="text-5xl font-semibold mb-2" style={{ color: '#0b4e9d' }}>$99</div>
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
@@ -278,7 +313,7 @@ export default function HomePage() {
               </div>
               <div className="text-center mb-6">
                 <h4 className="text-3xl font-semibold mb-2" style={{ color: '#0b4e9d' }}>Dearly Gift</h4>
-                <div className="text-5xl font-bold mb-2" style={{ color: '#0b4e9d' }}>$139</div>
+                <div className="text-5xl font-semibold mb-2" style={{ color: '#0b4e9d' }}>$139</div>
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
@@ -291,7 +326,7 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
-                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>AI-generated mini biography</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Mini biography</span>
                 </li>
               </ul>
               <Link href="/checkout">
@@ -305,7 +340,7 @@ export default function HomePage() {
             <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col hover:-translate-y-2">
               <div className="text-center mb-6">
                 <h4 className="text-3xl font-semibold mb-2" style={{ color: '#0b4e9d' }}>Dearly Legacy</h4>
-                <div className="text-5xl font-bold mb-2" style={{ color: '#0b4e9d' }}>$199</div>
+                <div className="text-5xl font-semibold mb-2" style={{ color: '#0b4e9d' }}>$199</div>
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
@@ -403,14 +438,17 @@ export default function HomePage() {
               When was the last time you asked your loved ones about their childhood? Their first love? The moments that changed everything?
             </p>
             <p className="text-lg mb-6 opacity-80" style={{ color: '#0b4e9d' }}>
-              These conversations won&apos;t happen on their own. Make time for what matters before time runs out.
+              These conversations won&apos;t happen on their own. Make time for what matters.
             </p>
-            <form className="flex flex-col sm:flex-row gap-3 max-w-md">
+            <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md">
               <input
                 type="email"
                 placeholder="Enter your email"
                 required
-                className="flex-1 px-6 py-3 rounded-full border-2 focus:outline-none focus:border-opacity-100 transition-all duration-300 flex items-center"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubmitting}
+                className="flex-1 px-6 py-3 rounded-full border-2 focus:outline-none focus:border-opacity-100 transition-all duration-300 flex items-center disabled:opacity-50"
                 style={{
                   borderColor: '#0b4e9d',
                   color: '#0b4e9d'
@@ -418,12 +456,18 @@ export default function HomePage() {
               />
               <button
                 type="submit"
-                className="px-8 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 whitespace-nowrap flex items-center justify-center"
+                disabled={isSubmitting}
+                className="px-8 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 whitespace-nowrap flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: '#0b4e9d' }}
               >
-                Stay Updated
+                {isSubmitting ? 'Subscribing...' : 'Stay Updated'}
               </button>
             </form>
+            {submitMessage && (
+              <p className="mt-3 text-sm font-medium" style={{ color: '#0b4e9d' }}>
+                {submitMessage}
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -432,8 +476,8 @@ export default function HomePage() {
       <footer className="py-16 mt-24" style={{ backgroundColor: '#0b4e9d' }}>
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
-            {/* About Us and Social Media Side by Side */}
-            <div className="grid md:grid-cols-2 gap-12 mb-12">
+            {/* About Us, Contact, and Social Media */}
+            <div className="grid md:grid-cols-3 gap-12 mb-12">
               {/* About Us Section */}
               <div>
                 <h4 className="text-2xl font-semibold mb-4 text-white">About Dearly</h4>
@@ -450,6 +494,22 @@ export default function HomePage() {
                   Dearly,<br />
                   Justin & Jose
                 </p>
+              </div>
+
+              {/* Contact Us */}
+              <div>
+                <h4 className="text-xl font-semibold mb-4 text-white">Contact Us</h4>
+                <ul className="flex flex-col gap-3 text-white opacity-80">
+                  <li>
+                    <a href="mailto:hello@dearly.com" className="hover:opacity-100 transition-opacity">
+                      hello@dearly.com
+                    </a>
+                  </li>
+                  <li className="mt-2">
+                    <p className="opacity-80">Have questions?</p>
+                    <p className="opacity-80">We&apos;d love to hear from you.</p>
+                  </li>
+                </ul>
               </div>
 
               {/* Social Media */}

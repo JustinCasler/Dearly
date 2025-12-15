@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = supabaseAdmin
     const body = await request.json()
-    const { session_id, slot_id } = body
+    const { session_id, slot_id, timezone } = body
 
     // Validate input
     if (!session_id || !slot_id) {
@@ -93,7 +93,8 @@ export async function POST(request: NextRequest) {
         start_time: (slot as any).start_time,
         end_time: (slot as any).end_time,
         status: 'scheduled',
-        booking_token
+        booking_token,
+        timezone: timezone || 'UTC'
       })
       .select()
       .single()
@@ -154,21 +155,23 @@ export async function POST(request: NextRequest) {
 
     // Send confirmation email to customer
     if (user) {
+      const scheduledTime = new Date((slot as any).start_time).toLocaleString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZone: timezone || 'America/New_York'
+      })
+
       const customerEmail = `
         <h1>Your Dearly Interview is Scheduled!</h1>
         <p>Hi ${(user as any).name},</p>
         <p>Your interview has been successfully scheduled for:</p>
-        <p><strong>${new Date((slot as any).start_time).toLocaleString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          timeZone: 'America/New_York'
-        })} EST</strong></p>
+        <p><strong>${scheduledTime}</strong></p>
         <p>You will receive a calendar invite and meeting link closer to your scheduled time.</p>
-        <p>Need to reschedule? Use this link:<br/>
+        <p>Need to manage your booking? Use this link:<br/>
         <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/booking/manage/${booking_token}">Manage Your Booking</a></p>
         <p>We're looking forward to creating a meaningful keepsake with you.</p>
         <p>Best,<br/>The Dearly Team</p>
@@ -183,19 +186,21 @@ export async function POST(request: NextRequest) {
 
     // Send notification email to internal team
     if (user && questionnaire) {
+      const teamScheduledTime = new Date((slot as any).start_time).toLocaleString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZone: 'America/New_York'
+      })
+
       const teamEmailContent = getBookingConfirmationEmail(
         'Team',
         (user as any).name,
         (questionnaire as any).interviewee_name,
-        new Date((slot as any).start_time).toLocaleString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          timeZone: 'America/New_York'
-        }) + ' EST',
+        teamScheduledTime,
         questionnaire
       )
 

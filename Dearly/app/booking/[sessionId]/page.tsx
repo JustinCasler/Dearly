@@ -17,6 +17,13 @@ export default function BookingPage() {
   const [loading, setLoading] = useState(true)
   const [booking, setBooking] = useState(false)
   const [error, setError] = useState('')
+  const [userTimezone, setUserTimezone] = useState<string>('')
+
+  useEffect(() => {
+    // Detect user's timezone
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    setUserTimezone(timezone)
+  }, [])
 
   useEffect(() => {
     validateSessionAndFetchData()
@@ -86,6 +93,7 @@ export default function BookingPage() {
         body: JSON.stringify({
           session_id: sessionId,
           slot_id: selectedSlot,
+          timezone: userTimezone || 'UTC',
         }),
       })
 
@@ -110,10 +118,10 @@ export default function BookingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f4f1ea' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading booking calendar...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: '#0b4e9d' }}></div>
+          <p className="mt-4 opacity-70" style={{ color: '#0b4e9d' }}>Loading booking calendar...</p>
         </div>
       </div>
     )
@@ -121,18 +129,19 @@ export default function BookingPage() {
 
   if (error && !session) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f4f1ea' }}>
+        <div className="max-w-md w-full bg-white shadow-sm rounded-2xl p-8 text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#0b4e9d' }}>Access Denied</h2>
+          <p className="mb-6 opacity-70" style={{ color: '#0b4e9d' }}>{error}</p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="px-6 py-3 text-white rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            style={{ backgroundColor: '#0b4e9d' }}
           >
             Go to Homepage
           </button>
@@ -142,15 +151,15 @@ export default function BookingPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F2EEE9' }}>
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#f4f1ea' }}>
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold font-serif mb-3" style={{ color: '#1A0089' }}>
+          <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{ color: '#0b4e9d' }}>
             Schedule Your Interview
           </h1>
-          <p className="text-lg opacity-70" style={{ color: '#1A0089' }}>
-            Select a time that works best for you. All times are shown in Eastern Time (EST).
+          <p className="text-lg opacity-70" style={{ color: '#0b4e9d' }}>
+            Select a time that works best for you. {userTimezone && `All times are shown in your local timezone (${userTimezone}).`}
           </p>
         </div>
 
@@ -166,7 +175,7 @@ export default function BookingPage() {
             <div className="text-center py-8">
               <svg
                 className="w-16 h-16 mx-auto mb-4 opacity-40"
-                style={{ color: '#1A0089' }}
+                style={{ color: '#0b4e9d' }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -178,8 +187,8 @@ export default function BookingPage() {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <p className="mb-2 font-semibold" style={{ color: '#1A0089' }}>No time slots available at the moment</p>
-              <p className="text-sm opacity-60" style={{ color: '#1A0089' }}>Please check back later or contact us for assistance.</p>
+              <p className="mb-2 font-semibold" style={{ color: '#0b4e9d' }}>No time slots available at the moment</p>
+              <p className="text-sm opacity-60" style={{ color: '#0b4e9d' }}>Please check back later or contact us for assistance.</p>
             </div>
           </div>
         ) : (
@@ -198,13 +207,13 @@ export default function BookingPage() {
             <button
               onClick={handleBookAppointment}
               disabled={!selectedSlot || booking}
-              className="w-full px-6 py-4 text-white text-lg font-semibold rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:scale-105"
-              style={{ backgroundColor: selectedSlot && !booking ? '#1A0089' : '#9CA3AF' }}
+              className="w-full px-6 py-4 text-white text-lg font-semibold rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:-translate-y-1"
+              style={{ backgroundColor: selectedSlot && !booking ? '#0b4e9d' : '#9CA3AF' }}
             >
               {booking ? 'Booking...' : selectedSlot ? 'Confirm Booking' : 'Select a Time Slot'}
             </button>
             {selectedSlot && (
-              <p className="mt-3 text-center text-sm opacity-70" style={{ color: '#1A0089' }}>
+              <p className="mt-3 text-center text-sm opacity-70" style={{ color: '#0b4e9d' }}>
                 You'll receive a confirmation email with all the details
               </p>
             )}

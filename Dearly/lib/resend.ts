@@ -51,42 +51,114 @@ export function getBookingConfirmationEmail(
   scheduledTime: string,
   questionnaire: any
 ) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+
   return `
     <!DOCTYPE html>
     <html>
       <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .info-box { background-color: #f3f4f6; padding: 15px; border-radius: 6px; margin: 15px 0; }
-          .questions { margin: 20px 0; }
-          .question { margin: 10px 0; padding: 10px; background-color: #f9fafb; border-left: 3px solid #4F46E5; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+          }
+          .email-wrapper {
+            background-color: #f5f5f5;
+            padding: 40px 20px;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+          .logo-section {
+            padding: 40px 20px 20px;
+            text-align: center;
+          }
+          .logo {
+            max-width: 200px;
+            height: auto;
+          }
+          .content {
+            padding: 20px 40px 40px;
+          }
+          .content p {
+            color: #333333;
+            margin: 12px 0;
+            font-size: 16px;
+          }
+          .info-box {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+          }
+          .info-box p {
+            margin: 8px 0;
+            font-size: 15px;
+          }
+          .questions {
+            margin: 25px 0;
+          }
+          .questions h3 {
+            color: #333333;
+            font-size: 18px;
+            margin-bottom: 15px;
+          }
+          .question {
+            margin: 10px 0;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            font-size: 14px;
+          }
+          .footer {
+            padding: 20px;
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+          }
         </style>
       </head>
       <body>
-        <div class="container">
-          <h1>New Interview Scheduled</h1>
-          <p>Hi ${interviewerName},</p>
-          <p>A new interview session has been scheduled:</p>
-          <div class="info-box">
-            <p><strong>Customer:</strong> ${customerName}</p>
-            <p><strong>Interviewee:</strong> ${intervieweeName}</p>
-            <p><strong>Scheduled Time:</strong> ${scheduledTime}</p>
-            <p><strong>Duration:</strong> ${questionnaire.length_minutes} minutes</p>
-            <p><strong>Medium:</strong> ${questionnaire.medium.replace('_', ' ').toUpperCase()}</p>
-            <p><strong>Relationship:</strong> ${questionnaire.relationship_to_interviewee}</p>
-          </div>
-          ${questionnaire.notes ? `<p><strong>Additional Notes:</strong><br>${questionnaire.notes}</p>` : ''}
-          <div class="questions">
-            <h3>Interview Questions:</h3>
-            ${questionnaire.questions.map((q: any, i: number) => `
-              <div class="question">
-                <strong>Q${i + 1}:</strong> ${q.text}
+        <div class="email-wrapper">
+          <div class="container">
+            <div class="logo-section">
+              <img src="${baseUrl}/dearly-logo.png" alt="Dearly" class="logo" />
+            </div>
+            <div class="content">
+              <p>Hi ${interviewerName},</p>
+              <p>New interview scheduled:</p>
+              <div class="info-box">
+                <p><strong>Customer:</strong> ${customerName}</p>
+                <p><strong>Interviewee:</strong> ${intervieweeName}</p>
+                <p><strong>Time:</strong> ${scheduledTime}</p>
+                <p><strong>Duration:</strong> ${questionnaire.length_minutes} minutes</p>
+                <p><strong>Medium:</strong> ${questionnaire.medium.replace('_', ' ')}</p>
+                <p><strong>Relationship:</strong> ${questionnaire.relationship_to_interviewee}</p>
               </div>
-            `).join('')}
+              ${questionnaire.notes ? `<p><strong>Notes:</strong> ${questionnaire.notes}</p>` : ''}
+              <div class="questions">
+                <h3>Questions</h3>
+                ${questionnaire.questions.map((q: any, i: number) => `
+                  <div class="question">
+                    <strong>${i + 1}.</strong> ${q.text}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div class="footer">
+              <p>Dearly - Preserve Your Stories</p>
+            </div>
           </div>
-          <p>Please review the questions and prepare for the interview. Good luck!</p>
         </div>
       </body>
     </html>
@@ -99,42 +171,101 @@ export function getInterviewReminderEmail(
   scheduledTime: string,
   manageBookingUrl: string
 ) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+
   return `
     <!DOCTYPE html>
     <html>
       <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .info-box { background-color: #f3f4f6; padding: 15px; border-radius: 6px; margin: 15px 0; }
-          .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-          .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+          }
+          .email-wrapper {
+            background-color: #f5f5f5;
+            padding: 40px 20px;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+          .logo-section {
+            padding: 40px 20px 20px;
+            text-align: center;
+          }
+          .logo {
+            max-width: 200px;
+            height: auto;
+          }
+          .content {
+            padding: 20px 40px 40px;
+            text-align: center;
+          }
+          .content p {
+            color: #333333;
+            margin: 15px 0;
+            font-size: 16px;
+          }
+          .info-box {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+          }
+          .info-box p {
+            margin: 8px 0;
+            font-size: 15px;
+          }
+          .button {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: #0b4e9d;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 600;
+            font-size: 16px;
+          }
+          .footer {
+            padding: 20px;
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+          }
         </style>
       </head>
       <body>
-        <div class="container">
-          <h1>Your Dearly Interview is Tomorrow!</h1>
-          <p>Hi ${name},</p>
-          <p>This is a friendly reminder that your interview with ${intervieweeName} is scheduled for tomorrow.</p>
-          <div class="info-box">
-            <p><strong>Interview Time:</strong> ${scheduledTime}</p>
-            <p><strong>Interviewee:</strong> ${intervieweeName}</p>
-          </div>
-          <p>You will receive the meeting link and calendar invite closer to your scheduled time.</p>
-          <p><strong>Tips for a Great Interview:</strong></p>
-          <ul>
-            <li>Find a quiet, comfortable space with good lighting</li>
-            <li>Test your camera and microphone beforehand</li>
-            <li>Have a glass of water nearby</li>
-            <li>Review the questions you submitted</li>
-          </ul>
-          <p>Need to reschedule? You can manage your booking here:</p>
-          <a href="${manageBookingUrl}" class="button">Manage Booking</a>
-          <p>We're looking forward to helping you capture these precious memories!</p>
-          <p>Best regards,<br>The Dearly Team</p>
-          <div class="footer">
-            <p>This email was sent by Dearly. If you have any questions, please contact us at ${process.env.INTERNAL_TEAM_EMAIL}</p>
+        <div class="email-wrapper">
+          <div class="container">
+            <div class="logo-section">
+              <img src="${baseUrl}/dearly-logo.png" alt="Dearly" class="logo" />
+            </div>
+            <div class="content">
+              <p>Hi ${name},</p>
+              <p>Your interview with ${intervieweeName} is tomorrow.</p>
+              <div class="info-box">
+                <p><strong>Time:</strong> ${scheduledTime}</p>
+                <p><strong>Interviewee:</strong> ${intervieweeName}</p>
+              </div>
+              <p style="font-size: 14px; color: #666666;">
+                You'll receive the meeting link closer to your scheduled time.
+              </p>
+              <a href="${manageBookingUrl}" class="button">Manage Booking</a>
+            </div>
+            <div class="footer">
+              <p>Dearly - Preserve Your Stories</p>
+            </div>
           </div>
         </div>
       </body>
@@ -142,31 +273,92 @@ export function getInterviewReminderEmail(
   `
 }
 
-export function getRecordingDeliveryEmail(name: string, recordingUrl: string) {
+export function getRecordingDeliveryEmail(name: string, listeningToken: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const listeningUrl = `${baseUrl}/listen/${listeningToken}`
+
   return `
     <!DOCTYPE html>
     <html>
       <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-          .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+          }
+          .email-wrapper {
+            background-color: #f5f5f5;
+            padding: 40px 20px;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+          .logo-section {
+            padding: 40px 20px 20px;
+            text-align: center;
+          }
+          .logo {
+            max-width: 200px;
+            height: auto;
+          }
+          .content {
+            padding: 20px 40px 40px;
+            text-align: center;
+          }
+          .content p {
+            color: #333333;
+            margin: 15px 0;
+            font-size: 16px;
+          }
+          .button {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: #0b4e9d;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 30px 0;
+            font-weight: 600;
+            font-size: 16px;
+          }
+          .footer {
+            padding: 20px;
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+          }
         </style>
       </head>
       <body>
-        <div class="container">
-          <h1>Your Recording is Ready!</h1>
-          <p>Hi ${name},</p>
-          <p>Great news! Your Dearly interview recording is now ready to view and download.</p>
-          <p>This recording captures precious memories and stories that will be treasured for generations to come.</p>
-          <a href="${recordingUrl}" class="button">Access Your Recording</a>
-          <p>We recommend downloading a copy for safekeeping. If you have any questions or need assistance, please don't hesitate to reach out.</p>
-          <p>Thank you for choosing Dearly to preserve these important stories.</p>
-          <p>Best regards,<br>The Dearly Team</p>
-          <div class="footer">
-            <p>This email was sent by Dearly. If you have any questions, please contact us at ${process.env.INTERNAL_TEAM_EMAIL}</p>
+        <div class="email-wrapper">
+          <div class="container">
+            <div class="logo-section">
+              <img src="${baseUrl}/dearly-logo.png" alt="Dearly" class="logo" />
+            </div>
+            <div class="content">
+              <p>Hi ${name},</p>
+              <p>Your recording is ready to listen and share.</p>
+              <a href="${listeningUrl}" class="button">Listen Now</a>
+              <p style="font-size: 14px; color: #999999; margin-top: 30px;">
+                Share this link with family:<br>
+                <a href="${listeningUrl}" style="color: #0b4e9d; word-break: break-all;">
+                  ${listeningUrl}
+                </a>
+              </p>
+            </div>
+            <div class="footer">
+              <p>Dearly - Preserve Your Stories</p>
+            </div>
           </div>
         </div>
       </body>
