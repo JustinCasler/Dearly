@@ -47,9 +47,9 @@ export default async function ListenPage({ params }: ListenPageProps) {
   }
 
   // Increment view count
-  await supabaseAdmin
+  await (supabaseAdmin as any)
     .from('listening_tokens')
-    .update({ view_count: (tokenData.view_count || 0) + 1 })
+    .update({ view_count: ((tokenData as any).view_count || 0) + 1 })
     .eq('token', token)
 
   // @ts-ignore - nested select types

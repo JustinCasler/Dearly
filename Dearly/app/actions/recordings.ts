@@ -22,7 +22,7 @@ export async function uploadAudioFile(
       .eq('id', user.id)
       .single()
 
-    if (!userData || !['admin', 'interviewer'].includes(userData.role)) {
+    if (!userData || !['admin', 'interviewer'].includes((userData as any).role)) {
       return { success: false, error: 'Unauthorized' }
     }
 
@@ -65,7 +65,7 @@ export async function uploadAudioFile(
     }
 
     // Update session with audio path
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await (supabaseAdmin as any)
       .from('sessions')
       .update({
         audio_storage_path: filePath,
@@ -102,7 +102,7 @@ export async function uploadTranscriptFile(
       .eq('id', user.id)
       .single()
 
-    if (!userData || !['admin', 'interviewer'].includes(userData.role)) {
+    if (!userData || !['admin', 'interviewer'].includes((userData as any).role)) {
       return { success: false, error: 'Unauthorized' }
     }
 
@@ -145,7 +145,7 @@ export async function uploadTranscriptFile(
     }
 
     // Update session with transcript path
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await (supabaseAdmin as any)
       .from('sessions')
       .update({
         transcript_storage_path: filePath
@@ -158,7 +158,7 @@ export async function uploadTranscriptFile(
     }
 
     // Create transcript record with pending status
-    const { error: transcriptError } = await supabaseAdmin
+    const { error: transcriptError } = await (supabaseAdmin as any)
       .from('transcripts')
       .insert({
         session_id: sessionId,
@@ -183,7 +183,7 @@ export async function processRecording(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Update session status to processing
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await (supabaseAdmin as any)
       .from('sessions')
       .update({ processing_status: 'processing' })
       .eq('id', sessionId)
@@ -206,7 +206,7 @@ export async function processRecording(
       console.error('Processing API error:', error)
 
       // Mark as failed
-      await supabaseAdmin
+      await (supabaseAdmin as any)
         .from('sessions')
         .update({ processing_status: 'failed' })
         .eq('id', sessionId)
@@ -219,7 +219,7 @@ export async function processRecording(
     console.error('Processing error:', error)
 
     // Mark as failed
-    await supabaseAdmin
+    await (supabaseAdmin as any)
       .from('sessions')
       .update({ processing_status: 'failed' })
       .eq('id', sessionId)
@@ -235,7 +235,7 @@ export async function generateListeningToken(
     // Generate secure random token
     const token = crypto.randomBytes(32).toString('hex')
 
-    const { error } = await supabaseAdmin
+    const { error } = await (supabaseAdmin as any)
       .from('listening_tokens')
       .insert({
         session_id: sessionId,
@@ -271,7 +271,7 @@ export async function deliverRecording(
     }
 
     // Check if token already exists
-    const { data: existingToken } = await supabaseAdmin
+    const { data: existingToken } = await (supabaseAdmin as any)
       .from('listening_tokens')
       .select('token')
       .eq('session_id', sessionId)
@@ -280,7 +280,7 @@ export async function deliverRecording(
     let token: string
 
     if (existingToken) {
-      token = existingToken.token
+      token = (existingToken as any).token
     } else {
       // Generate listening token
       const tokenResult = await generateListeningToken(sessionId)
@@ -293,7 +293,7 @@ export async function deliverRecording(
     }
 
     // Send email with listening link
-    const user = session.users as any
+    const user = (session as any).users
     await sendEmail({
       to: user.email,
       subject: 'Your Dearly recording is ready!',
@@ -301,7 +301,7 @@ export async function deliverRecording(
     })
 
     // Update session status to delivered
-    await supabaseAdmin
+    await (supabaseAdmin as any)
       .from('sessions')
       .update({ status: 'delivered' })
       .eq('id', sessionId)

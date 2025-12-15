@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!
-})
-
 export async function POST(request: NextRequest) {
+  // Lazy instantiate OpenAI client to avoid build-time errors
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY!
+  })
   try {
     const { sessionId } = await request.json()
 
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get transcript record
-    const { data: transcriptRecord, error: transcriptError } = await supabaseAdmin
+    const { data: transcriptRecord, error: transcriptError } = await (supabaseAdmin as any)
       .from('transcripts')
       .select('*')
       .eq('session_id', sessionId)
@@ -47,12 +47,12 @@ export async function POST(request: NextRequest) {
     // Download transcript file from storage
     const { data: transcriptData, error: downloadError } = await supabaseAdmin.storage
       .from('transcripts')
-      .download(transcriptRecord.storage_path)
+      .download((transcriptRecord as any).storage_path)
 
     if (downloadError || !transcriptData) {
       console.error('Download error:', downloadError)
 
-      await supabaseAdmin
+      await (supabaseAdmin as any)
         .from('transcripts')
         .update({
           processing_status: 'failed',
@@ -75,10 +75,10 @@ export async function POST(request: NextRequest) {
     const questions = questionnaire.questions as Array<{ id: string; text: string }>
 
     // Update transcript status to processing
-    await supabaseAdmin
+    await (supabaseAdmin as any)
       .from('transcripts')
       .update({ processing_status: 'processing' })
-      .eq('id', transcriptRecord.id)
+      .eq('id', (transcriptRecord as any).id)
 
     // Use OpenAI to analyze transcript and detect timestamps
     console.log('Analyzing transcript with OpenAI...')
@@ -134,15 +134,15 @@ Analyze this transcript and return a JSON object with the "segments" array as de
     }
 
     // Update transcript status to completed
-    await supabaseAdmin
+    await (supabaseAdmin as any)
       .from('transcripts')
       .update({ processing_status: 'completed' })
-      .eq('id', transcriptRecord.id)
+      .eq('id', (transcriptRecord as any).id)
 
     // Insert transcript segments
     if (analysis.segments.length > 0) {
       const segments = analysis.segments.map((seg: any) => ({
-        transcript_id: transcriptRecord.id,
+        transcript_id: (transcriptRecord as any).id,
         question_id: seg.question_id,
         start_time: parseFloat(seg.start_time) || 0,
         end_time: parseFloat(seg.end_time) || 0,
@@ -150,7 +150,7 @@ Analyze this transcript and return a JSON object with the "segments" array as de
         sequence_order: typeof seg.sequence_order === 'number' ? seg.sequence_order : 0
       }))
 
-      const { error: segmentsError } = await supabaseAdmin
+      const { error: segmentsError } = await (supabaseAdmin as any)
         .from('transcript_segments')
         .insert(segments)
 
@@ -161,7 +161,7 @@ Analyze this transcript and return a JSON object with the "segments" array as de
     }
 
     // Update session status to ready
-    await supabaseAdmin
+    await (supabaseAdmin as any)
       .from('sessions')
       .update({ processing_status: 'ready' })
       .eq('id', sessionId)
@@ -178,12 +178,12 @@ Analyze this transcript and return a JSON object with the "segments" array as de
     try {
       const { sessionId } = await request.json()
 
-      await supabaseAdmin
+      await (supabaseAdmin as any)
         .from('sessions')
         .update({ processing_status: 'failed' })
         .eq('id', sessionId)
 
-      await supabaseAdmin
+      await (supabaseAdmin as any)
         .from('transcripts')
         .update({
           processing_status: 'failed',

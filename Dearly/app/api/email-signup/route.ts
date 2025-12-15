@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,10 +22,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
-
     // Insert email into database
-    const { data, error } = await supabase
+    const { data, error } = await (supabaseAdmin as any)
       .from('email_signups')
       .insert([{ email: email.toLowerCase().trim() }])
       .select()
