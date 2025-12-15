@@ -1,18 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { AvailabilitySlot, Appointment } from '@/types/database'
 
 export default function ManageBooking() {
   const router = useRouter()
   const params = useParams()
+  const searchParams = useSearchParams()
   const token = params.token as string
+  const wasRescheduled = searchParams.get('rescheduled') === 'true'
 
   const [appointment, setAppointment] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [userTimezone, setUserTimezone] = useState<string>('')
 
   useEffect(() => {
@@ -20,6 +23,15 @@ export default function ManageBooking() {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     setUserTimezone(timezone)
   }, [])
+
+  useEffect(() => {
+    if (wasRescheduled) {
+      setSuccessMessage('Your appointment has been successfully rescheduled!')
+      // Clear the success message after 5 seconds
+      const timer = setTimeout(() => setSuccessMessage(''), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [wasRescheduled])
 
   useEffect(() => {
     fetchAppointment()
@@ -152,6 +164,12 @@ export default function ManageBooking() {
           <p className="opacity-70" style={{ color: '#0b4e9d' }}>View or modify your scheduled interview</p>
         </div>
 
+        {successMessage && (
+          <div className="mb-6 p-4 rounded-2xl bg-green-50 border-2 border-green-200">
+            <p className="text-green-800">{successMessage}</p>
+          </div>
+        )}
+
         {error && (
           <div className="mb-6 p-4 rounded-2xl" style={{ backgroundColor: '#FEE', borderColor: '#FF5E33', color: '#991B1B' }}>
             {error}
@@ -209,7 +227,7 @@ export default function ManageBooking() {
             {appointment.status === 'scheduled' && !isPast && (
               <div className="mt-6 space-y-3">
                 <button
-                  onClick={() => router.push(`/booking/${appointment.session_id}`)}
+                  onClick={() => router.push(`/booking/reschedule/${token}`)}
                   className="w-full px-6 py-3 text-white rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                   style={{ backgroundColor: '#0b4e9d' }}
                 >
