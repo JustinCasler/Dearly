@@ -288,7 +288,7 @@ export default function HomePage() {
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
-                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>1-hour guided audio interview (remote)</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>30-minute guided audio interview (remote)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
@@ -318,7 +318,11 @@ export default function HomePage() {
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
-                  <span className="text-sm font-semibold opacity-80" style={{ color: '#0b4e9d' }}>Everything in Essential +</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>60-minute guided audio interview (remote)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Edited audio with music</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
@@ -345,7 +349,19 @@ export default function HomePage() {
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
-                  <span className="text-sm font-semibold opacity-80" style={{ color: '#0b4e9d' }}>Everything in Gift +</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>90-minute guided audio interview (remote)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Edited audio with music</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Full polished transcript</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Mini biography</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>

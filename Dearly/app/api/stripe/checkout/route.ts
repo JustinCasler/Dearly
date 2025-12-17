@@ -22,6 +22,34 @@ export async function POST(req: NextRequest) {
 
     const amount = getPriceForLength(length_minutes as 30 | 60 | 90)
 
+    // Get package details based on length
+    const getPackageDetails = (minutes: number) => {
+      switch (minutes) {
+        case 30:
+          return {
+            name: 'Dearly Essential',
+            description: '30-minute guided audio interview with professional editing and music'
+          }
+        case 60:
+          return {
+            name: 'Dearly Gift',
+            description: '60-minute guided audio interview with professional editing, music, full polished transcript, and mini biography'
+          }
+        case 90:
+          return {
+            name: 'Dearly Legacy',
+            description: '90-minute guided audio interview with professional editing, music, full polished transcript, mini biography, plus a free interview for another family member'
+          }
+        default:
+          return {
+            name: 'Dearly Interview',
+            description: 'Professional interview session'
+          }
+      }
+    }
+
+    const packageDetails = getPackageDetails(length_minutes)
+
     // Encode the full questionnaire as base64 to pass in URL
     const questionnaireEncoded = Buffer.from(JSON.stringify(questionnaire)).toString('base64url')
 
@@ -44,8 +72,8 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `Dearly Interview - ${length_minutes} minutes`,
-              description: `Professional interview session with ${questionnaire.interviewee_name}`,
+              name: `${packageDetails.name} - Interview with ${questionnaire.interviewee_name}`,
+              description: packageDetails.description,
             },
             unit_amount: amount,
           },

@@ -280,12 +280,28 @@ export default function CheckoutPage() {
     }
   }
 
-  const getPackageDescription = () => {
+  const getPackageFeatures = () => {
     switch (lengthMinutes) {
-      case 30: return '30-minute professional interview'
-      case 60: return '60-minute comprehensive interview with transcript'
-      case 90: return '90-minute complete life story with mini biography'
-      default: return '60-minute comprehensive interview with transcript'
+      case 30: return [
+        '1-hour guided audio interview (remote)',
+        'Edited audio with music',
+        'Delivered digitally'
+      ]
+      case 60: return [
+        'Everything in Essential +',
+        'Full polished transcript',
+        'Mini biography'
+      ]
+      case 90: return [
+        'Everything in Gift +',
+        'Free interview for another family member',
+        'Early access to downloadable family e-book (PDF) after 3 family interviews'
+      ]
+      default: return [
+        'Everything in Essential +',
+        'Full polished transcript',
+        'Mini biography'
+      ]
     }
   }
 
@@ -723,19 +739,26 @@ export default function CheckoutPage() {
 
               {/* Package Info */}
               <div className="mb-4 pb-4 border-b" style={{ borderColor: 'rgba(11, 78, 157, 0.2)' }}>
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <p className="font-semibold text-lg" style={{ color: '#0b4e9d' }}>
-                      Dearly {getPackageName()}
-                    </p>
-                    <p className="text-sm opacity-70" style={{ color: '#0b4e9d' }}>
-                      {getPackageDescription()}
-                    </p>
-                  </div>
+                <div className="flex justify-between items-start mb-4">
+                  <p className="font-semibold text-lg" style={{ color: '#0b4e9d' }}>
+                    Dearly {getPackageName()}
+                  </p>
                   <span className="text-2xl font-bold font-serif flex-shrink-0 ml-4" style={{ color: '#0b4e9d' }}>
                     {getPrice()}
                   </span>
                 </div>
+
+                {/* Features List */}
+                <ul className="space-y-2">
+                  {getPackageFeatures().map((feature, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-lg flex-shrink-0" style={{ color: '#0b4e9d' }}>✓</span>
+                      <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
               {/* Interview Details */}
