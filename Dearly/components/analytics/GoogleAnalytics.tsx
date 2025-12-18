@@ -2,9 +2,9 @@
 
 import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 
-export function GoogleAnalytics({ gaId }: { gaId: string }) {
+function AnalyticsTracker({ gaId }: { gaId: string }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -14,12 +14,19 @@ export function GoogleAnalytics({ gaId }: { gaId: string }) {
     }
   }, [pathname, searchParams])
 
+  return null
+}
+
+export function GoogleAnalytics({ gaId }: { gaId: string }) {
   if (!gaId || gaId === '') {
     return null
   }
 
   return (
     <>
+      <Suspense fallback={null}>
+        <AnalyticsTracker gaId={gaId} />
+      </Suspense>
       <Script
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
