@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manjari } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 
 const manjari = Manjari({
   variable: "--font-manjari",
@@ -75,6 +76,7 @@ export default function RootLayout({
       <body
         className={`${manjari.variable} ${conformity.variable} antialiased`}
       >
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
         {children}
       </body>
     </html>

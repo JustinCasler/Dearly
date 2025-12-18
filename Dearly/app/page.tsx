@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import { analytics } from '@/lib/analytics'
 
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -38,6 +39,7 @@ export default function HomePage() {
       if (response.ok) {
         setSubmitMessage('Thank you for subscribing!')
         setEmail('')
+        analytics.submitEmailSignup()
       } else {
         setSubmitMessage(data.error || 'Something went wrong')
       }
@@ -62,7 +64,12 @@ export default function HomePage() {
                 className="transition-transform duration-300 group-hover:scale-105"
               />
             </div>
-            <Link href="/checkout" className="font-semibold hover:opacity-70 transition-all duration-300 text-sm md:text-base" style={{ color: '#0b4e9d' }}>
+            <Link
+              href="/checkout"
+              onClick={() => analytics.clickBookInterview('header')}
+              className="font-semibold hover:opacity-70 transition-all duration-300 text-sm md:text-base"
+              style={{ color: '#0b4e9d' }}
+            >
               Book an interview
             </Link>
           </nav>
@@ -89,7 +96,11 @@ export default function HomePage() {
             PRESERVE YOUR STORIES
           </h2>
           <Link href="/checkout">
-            <button className="px-10 py-3 md:px-12 md:py-3 rounded-full text-white font-semibold hover:opacity-90 transition-all duration-300 shadow-lg text-lg hover:shadow-2xl hover:scale-105 mb-12 md:mb-16 flex items-center justify-center" style={{ backgroundColor: '#0b4e9d' }}>
+            <button
+              onClick={() => analytics.clickBookInterview('hero')}
+              className="px-10 py-3 md:px-12 md:py-3 rounded-full text-white font-semibold hover:opacity-90 transition-all duration-300 shadow-lg text-lg hover:shadow-2xl hover:scale-105 mb-12 md:mb-16 flex items-center justify-center"
+              style={{ backgroundColor: '#0b4e9d' }}
+            >
               Book an interview
             </button>
           </Link>
@@ -151,7 +162,11 @@ export default function HomePage() {
 
           <div className="flex justify-center">
             <Link href="/checkout">
-              <button className="px-8 py-3 rounded-full text-white font-semibold hover:opacity-90 transition-all duration-300 text-lg hover:shadow-xl hover:scale-105 hover:-translate-y-1 flex items-center justify-center" style={{ backgroundColor: '#0b4e9d' }}>
+              <button
+                onClick={() => analytics.clickBookInterview('features')}
+                className="px-8 py-3 rounded-full text-white font-semibold hover:opacity-90 transition-all duration-300 text-lg hover:shadow-xl hover:scale-105 hover:-translate-y-1 flex items-center justify-center"
+                style={{ backgroundColor: '#0b4e9d' }}
+              >
                 Book Your Interview
               </button>
             </Link>
@@ -300,7 +315,11 @@ export default function HomePage() {
                 </li>
               </ul>
               <Link href="/checkout">
-                <button className="w-full px-6 py-3 rounded-full font-semibold transition-all duration-300 border-2 hover:shadow-lg hover:scale-105 hover:-translate-y-1 flex items-center justify-center" style={{ borderColor: '#0b4e9d', color: '#0b4e9d', backgroundColor: 'transparent' }}>
+                <button
+                  onClick={() => analytics.clickGetStarted('Essential - $99')}
+                  className="w-full px-6 py-3 rounded-full font-semibold transition-all duration-300 border-2 hover:shadow-lg hover:scale-105 hover:-translate-y-1 flex items-center justify-center"
+                  style={{ borderColor: '#0b4e9d', color: '#0b4e9d', backgroundColor: 'transparent' }}
+                >
                   Get Started
                 </button>
               </Link>
@@ -334,7 +353,11 @@ export default function HomePage() {
                 </li>
               </ul>
               <Link href="/checkout">
-                <button className="w-full px-6 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 flex items-center justify-center" style={{ backgroundColor: '#0b4e9d' }}>
+                <button
+                  onClick={() => analytics.clickGetStarted('Gift - $139')}
+                  className="w-full px-6 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 flex items-center justify-center"
+                  style={{ backgroundColor: '#0b4e9d' }}
+                >
                   Get Started
                 </button>
               </Link>
@@ -373,7 +396,11 @@ export default function HomePage() {
                 </li>
               </ul>
               <Link href="/checkout">
-                <button className="w-full px-6 py-3 rounded-full font-semibold transition-all duration-300 border-2 hover:shadow-lg hover:scale-105 hover:-translate-y-1 flex items-center justify-center" style={{ borderColor: '#0b4e9d', color: '#0b4e9d', backgroundColor: 'transparent' }}>
+                <button
+                  onClick={() => analytics.clickGetStarted('Legacy - $199')}
+                  className="w-full px-6 py-3 rounded-full font-semibold transition-all duration-300 border-2 hover:shadow-lg hover:scale-105 hover:-translate-y-1 flex items-center justify-center"
+                  style={{ borderColor: '#0b4e9d', color: '#0b4e9d', backgroundColor: 'transparent' }}
+                >
                   Get Started
                 </button>
               </Link>
@@ -422,7 +449,11 @@ export default function HomePage() {
           </h3>
           <div className="flex justify-center mb-4">
             <Link href="/checkout">
-              <button className="px-8 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 flex items-center justify-center" style={{ backgroundColor: '#0b4e9d' }}>
+              <button
+                onClick={() => analytics.clickBookInterview('cta-section')}
+                className="px-8 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 flex items-center justify-center"
+                style={{ backgroundColor: '#0b4e9d' }}
+              >
                 Book Your Interview
               </button>
             </Link>
