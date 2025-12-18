@@ -76,7 +76,7 @@ export default function RootLayout({
       <body
         className={`${manjari.variable} ${conformity.variable} antialiased`}
       >
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
+        <GoogleAnalytics />
         {children}
       </body>
     </html>

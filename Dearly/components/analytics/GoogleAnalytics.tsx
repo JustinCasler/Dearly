@@ -4,32 +4,38 @@ import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, Suspense } from 'react'
 
-function AnalyticsTracker({ gaId }: { gaId: string }) {
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID
+
+function AnalyticsTracker() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    if (pathname) {
-      pageview(pathname, searchParams?.toString())
+    if (pathname && GA_MEASUREMENT_ID) {
+      const url = searchParams ? `${pathname}?${searchParams.toString()}` : pathname
+
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('config', GA_MEASUREMENT_ID, {
+          page_path: url,
+        })
+      }
     }
   }, [pathname, searchParams])
 
   return null
 }
 
-export function GoogleAnalytics({ gaId }: { gaId: string }) {
-  if (!gaId || gaId === '') {
+export function GoogleAnalytics() {
+  if (!GA_MEASUREMENT_ID || GA_MEASUREMENT_ID === '') {
+    console.warn('Google Analytics ID not found')
     return null
   }
 
   return (
     <>
-      <Suspense fallback={null}>
-        <AnalyticsTracker gaId={gaId} />
-      </Suspense>
       <Script
         strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
       />
       <Script
         id="google-analytics"
@@ -39,12 +45,15 @@ export function GoogleAnalytics({ gaId }: { gaId: string }) {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${gaId}', {
+            gtag('config', '${GA_MEASUREMENT_ID}', {
               page_path: window.location.pathname,
             });
           `,
         }}
       />
+      <Suspense fallback={null}>
+        <AnalyticsTracker />
+      </Suspense>
     </>
   )
 }
