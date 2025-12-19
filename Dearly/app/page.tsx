@@ -564,7 +564,7 @@ export default function HomePage() {
                 <h4 className="text-xl font-semibold mb-4 text-white">Follow Us</h4>
                 <ul className="flex flex-col gap-3 text-white opacity-80">
                   <li><Link href="#" className="hover:opacity-100 transition-opacity">Twitter</Link></li>
-                  <li><Link href="#" className="hover:opacity-100 transition-opacity">Instagram</Link></li>
+                  <li><Link href="https://www.instagram.com/dearlystories/" target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity">Instagram</Link></li>
                   <li><Link href="#" className="hover:opacity-100 transition-opacity">Facebook</Link></li>
                 </ul>
               </div>

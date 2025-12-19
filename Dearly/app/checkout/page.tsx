@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { questionnaireSchema, QuestionnaireFormData } from '@/lib/validations'
@@ -60,7 +60,7 @@ const THEME_QUESTIONS = {
   ],
 }
 
-export default function CheckoutPage() {
+function CheckoutPageContent() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [generalError, setGeneralError] = useState<string | null>(null)
   const [selectedTheme, setSelectedTheme] = useState<string>('')
@@ -839,6 +839,21 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f4f1ea' }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#0b4e9d' }}></div>
+          <p style={{ color: '#0b4e9d' }}>Loading...</p>
+        </div>
+      </div>
+    }>
+      <CheckoutPageContent />
+    </Suspense>
   )
 }
 
