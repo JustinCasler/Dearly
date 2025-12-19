@@ -303,7 +303,7 @@ export default function HomePage() {
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
-                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>30-minute guided audio interview (remote)</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>60-minute guided audio interview (remote)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
@@ -314,7 +314,7 @@ export default function HomePage() {
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Delivered digitally</span>
                 </li>
               </ul>
-              <Link href="/checkout">
+              <Link href="/checkout?package=essential">
                 <button
                   onClick={() => analytics.clickGetStarted('Essential - $99')}
                   className="w-full px-6 py-3 rounded-full font-semibold transition-all duration-300 border-2 hover:shadow-lg hover:scale-105 hover:-translate-y-1 flex items-center justify-center"
@@ -352,7 +352,7 @@ export default function HomePage() {
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Mini biography</span>
                 </li>
               </ul>
-              <Link href="/checkout">
+              <Link href="/checkout?package=gift">
                 <button
                   onClick={() => analytics.clickGetStarted('Gift - $139')}
                   className="w-full px-6 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 flex items-center justify-center"
@@ -372,7 +372,7 @@ export default function HomePage() {
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
-                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>90-minute guided audio interview (remote)</span>
+                  <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>60-minute guided audio interview (remote)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-lg" style={{ color: '#0b4e9d' }}>✓</span>
@@ -395,7 +395,7 @@ export default function HomePage() {
                   <span className="text-sm opacity-80" style={{ color: '#0b4e9d' }}>Early access to downloadable family e-book (PDF) after 3 family interviews</span>
                 </li>
               </ul>
-              <Link href="/checkout">
+              <Link href="/checkout?package=legacy">
                 <button
                   onClick={() => analytics.clickGetStarted('Legacy - $199')}
                   className="w-full px-6 py-3 rounded-full font-semibold transition-all duration-300 border-2 hover:shadow-lg hover:scale-105 hover:-translate-y-1 flex items-center justify-center"

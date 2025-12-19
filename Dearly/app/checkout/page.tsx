@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { questionnaireSchema, QuestionnaireFormData } from '@/lib/validations'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const FORM_STORAGE_KEY = 'dearly_checkout_form'
 
@@ -62,11 +62,11 @@ const THEME_QUESTIONS = {
 
 export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [generalError, setGeneralError] = useState<string | null>(null)
   const [selectedTheme, setSelectedTheme] = useState<string>('')
   const [currentStep, setCurrentStep] = useState(1)
-  const [validationError, setValidationError] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const {
     register,
@@ -75,11 +75,14 @@ export default function CheckoutPage() {
     watch,
     setValue,
     formState: { errors },
+    setFocus,
+    setError,
+    clearErrors,
   } = useForm<QuestionnaireFormData>({
     resolver: zodResolver(questionnaireSchema),
     defaultValues: {
       length_minutes: 60,
-      medium: 'zoom',
+      medium: 'google_meet',
       questions: [
         { id: '1', text: '' },
         { id: '2', text: '' },
@@ -96,6 +99,8 @@ export default function CheckoutPage() {
   // Load saved form data on mount
   useEffect(() => {
     const savedData = localStorage.getItem(FORM_STORAGE_KEY)
+    const packageParam = searchParams.get('package')
+
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData)
@@ -103,7 +108,8 @@ export default function CheckoutPage() {
         Object.keys(parsedData).forEach((key) => {
           if (key === 'questions') {
             replace(parsedData[key])
-          } else {
+          } else if (key !== 'length_minutes') {
+            // Don't restore length_minutes from localStorage if we have a package param
             setValue(key as any, parsedData[key])
           }
         })
@@ -119,7 +125,20 @@ export default function CheckoutPage() {
         console.error('Failed to restore form data:', err)
       }
     }
-  }, [setValue, replace])
+
+    // Apply package from URL after localStorage restore
+    if (packageParam) {
+      const packageToMinutes: { [key: string]: 30 | 60 | 90 } = {
+        essential: 30,
+        gift: 60,
+        legacy: 90,
+      }
+      const minutes = packageToMinutes[packageParam]
+      if (minutes) {
+        setValue('length_minutes', minutes)
+      }
+    }
+  }, [setValue, replace, searchParams])
 
   // Save form data to localStorage whenever it changes
   const formValues = watch()
@@ -153,9 +172,20 @@ export default function CheckoutPage() {
 
   const lengthMinutes = watch('length_minutes')
 
+  const scrollToAndFocusField = (fieldName: string) => {
+    setTimeout(() => {
+      setFocus(fieldName as any)
+      // Find the input element and scroll it into view centered
+      const input = document.querySelector(`[name="${fieldName}"]`) as HTMLElement
+      if (input) {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 100)
+  }
+
   const handleNextStep = () => {
-    // Validate first page fields before proceeding
-    setValidationError(null)
+    // Clear all previous errors
+    clearErrors()
 
     const name = watch('name')
     const email = watch('email')
@@ -164,34 +194,42 @@ export default function CheckoutPage() {
     const lengthMinutes = watch('length_minutes')
     const medium = watch('medium')
 
+    // Validate and scroll to first error
     if (!name || name.trim() === '') {
-      setValidationError('Please enter your name')
+      setError('name', { type: 'manual', message: 'Please enter your name' })
+      scrollToAndFocusField('name')
       return
     }
     if (!email || email.trim() === '') {
-      setValidationError('Please enter your email')
+      setError('email', { type: 'manual', message: 'Please enter your email' })
+      scrollToAndFocusField('email')
       return
     }
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      setValidationError('Please enter a valid email address')
+      setError('email', { type: 'manual', message: 'Please enter a valid email address' })
+      scrollToAndFocusField('email')
       return
     }
     if (!intervieweeName || intervieweeName.trim() === '') {
-      setValidationError('Please enter the interviewee\'s name')
+      setError('interviewee_name', { type: 'manual', message: "Please enter the interviewee's name" })
+      scrollToAndFocusField('interviewee_name')
       return
     }
     if (!relationship || relationship.trim() === '') {
-      setValidationError('Please enter your relationship to the interviewee')
+      setError('relationship_to_interviewee', { type: 'manual', message: 'Please enter your relationship to the interviewee' })
+      scrollToAndFocusField('relationship_to_interviewee')
       return
     }
     if (!lengthMinutes) {
-      setValidationError('Please select a session length')
+      setError('length_minutes', { type: 'manual', message: 'Please select a session length' })
+      scrollToAndFocusField('length_minutes')
       return
     }
     if (!medium) {
-      setValidationError('Please select an interview medium')
+      setError('medium', { type: 'manual', message: 'Please select an interview medium' })
+      scrollToAndFocusField('medium')
       return
     }
 
@@ -200,7 +238,6 @@ export default function CheckoutPage() {
   }
 
   const handlePreviousStep = () => {
-    setValidationError(null)
     setCurrentStep(1)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -213,18 +250,32 @@ export default function CheckoutPage() {
     }
   }
 
+  const scrollToQuestion = (index: number) => {
+    const questionElement = document.getElementById(`question-${index}`)
+    if (questionElement) {
+      questionElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      setTimeout(() => {
+        const textarea = questionElement.querySelector('textarea')
+        textarea?.focus()
+      }, 300)
+    }
+  }
+
   const onSubmit = async (data: QuestionnaireFormData) => {
     console.log('Form submitted with data:', data)
     setIsSubmitting(true)
-    setError(null)
+    setGeneralError(null)
 
     try {
-      // Validate that all questions are filled in
-      const emptyQuestions = data.questions.filter(q => !q.text || q.text.trim() === '')
-      if (emptyQuestions.length > 0) {
-        setError('Please fill in all question fields or remove empty questions')
+      // Validate that all questions are filled in and scroll to first empty
+      const emptyQuestionIndex = data.questions.findIndex(q => !q.text || q.text.trim() === '')
+      if (emptyQuestionIndex !== -1) {
+        setError(`questions.${emptyQuestionIndex}.text` as any, {
+          type: 'manual',
+          message: 'Please fill in this question or remove it'
+        })
+        scrollToQuestion(emptyQuestionIndex)
         setIsSubmitting(false)
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
         return
       }
 
@@ -250,7 +301,7 @@ export default function CheckoutPage() {
       router.push('/booking/session')
     } catch (err) {
       console.error('Checkout error:', err)
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setGeneralError(err instanceof Error ? err.message : 'An error occurred')
       setIsSubmitting(false)
     }
   }
@@ -356,9 +407,9 @@ export default function CheckoutPage() {
               : 'Choose a theme or create custom questions for the interview.'}
           </p>
 
-          {error && (
+          {generalError && (
             <div className="mb-6 p-4 rounded-2xl border-2 text-red-700" style={{ backgroundColor: '#FEE', borderColor: '#FF5E33' }}>
-              {error}
+              {generalError}
             </div>
           )}
 
@@ -481,24 +532,15 @@ export default function CheckoutPage() {
             </div>
 
             {/* Next Button for Step 1 */}
-            <div className="space-y-4">
-              {/* Validation Error */}
-              {validationError && (
-                <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 text-center">
-                  <p className="text-red-600 font-medium">{validationError}</p>
-                </div>
-              )}
-
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleNextStep}
-                  className="px-8 py-4 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 text-lg"
-                  style={{ backgroundColor: '#0b4e9d' }}
-                >
-                  Continue to Questions →
-                </button>
-              </div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handleNextStep}
+                className="px-8 py-4 rounded-full text-white font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 text-lg"
+                style={{ backgroundColor: '#0b4e9d' }}
+              >
+                Continue to Questions →
+              </button>
             </div>
             </>
             )}
@@ -630,7 +672,7 @@ export default function CheckoutPage() {
 
               <div className="space-y-3 md:space-y-4">
                 {fields.map((field, index) => (
-                  <div key={field.id}>
+                  <div key={field.id} id={`question-${index}`}>
                     {/* Mobile: Label and icon on top */}
                     <div className="flex items-center justify-between mb-2 md:hidden">
                       <label className="block text-sm font-medium" style={{ color: '#0b4e9d' }}>
@@ -783,23 +825,14 @@ export default function CheckoutPage() {
             </div>
 
             {/* Submit Button for Step 2 */}
-            <div className="space-y-4">
-              {/* Validation Error */}
-              {error && (
-                <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 text-center">
-                  <p className="text-red-600 font-medium">{error}</p>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full text-white py-4 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-                style={{ backgroundColor: '#0b4e9d' }}
-              >
-                {isSubmitting ? 'Loading...' : 'Continue to Select Interview Time'}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full text-white py-4 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+              style={{ backgroundColor: '#0b4e9d' }}
+            >
+              {isSubmitting ? 'Loading...' : 'Continue to Select Interview Time'}
+            </button>
             </>
             )}
           </form>
