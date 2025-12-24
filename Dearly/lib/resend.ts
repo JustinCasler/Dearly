@@ -51,7 +51,7 @@ export function getBookingConfirmationEmail(
   scheduledTime: string,
   questionnaire: any
 ) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
   return `
     <!DOCTYPE html>
@@ -171,7 +171,7 @@ export function getInterviewReminderEmail(
   scheduledTime: string,
   manageBookingUrl: string
 ) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
   return `
     <!DOCTYPE html>
@@ -274,7 +274,7 @@ export function getInterviewReminderEmail(
 }
 
 export function getEmailSignupConfirmationEmail() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
   return `
     <!DOCTYPE html>
@@ -363,7 +363,7 @@ export function getEmailSignupConfirmationEmail() {
 }
 
 export function getPaymentConfirmationEmail(name: string, packageName: string, intervieweeName: string, sessionId: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
   const bookingUrl = `${baseUrl}/booking/${sessionId}`
 
   return `
@@ -472,7 +472,7 @@ export function getPaymentConfirmationEmail(name: string, packageName: string, i
 }
 
 export function getRecordingDeliveryEmail(name: string, listeningToken: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
   const listeningUrl = `${baseUrl}/listen/${listeningToken}`
 
   return `
