@@ -463,7 +463,7 @@ function CheckoutPageContent() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2" style={{ color: '#0b4e9d' }}>
-                    Who will be interviewed? *
+                    Interviewee's name*
                   </label>
                   <input
                     type="text"
