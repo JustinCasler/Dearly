@@ -116,10 +116,10 @@ export default function HomePage() {
             </div>
           </div>
           <h3 className="permanent-marker text-3xl md:text-4xl lg:text-5xl mb-8 leading-tight" style={{ color: '#0b4e9d' }}>
-            The best way to keep your family legacy
+            The best way to save a moment
           </h3>
           <p className="text-lg md:text-xl mb-12 opacity-80" style={{ color: '#0b4e9d' }}>
-            We provide professional guidance in edited interviews.
+            We provide professionally guided, edited interviews.
           </p>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
@@ -152,10 +152,10 @@ export default function HomePage() {
 
             <div className="bg-white p-8 rounded-2xl shadow-sm text-left transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group cursor-pointer">
               <h4 className="text-xl font-bold mb-3 pb-2 transition-colors duration-300 inline-block border-b-4" style={{ color: '#0b4e9d', borderColor: '#0b4e9d' }}>
-                Family Tree Integration
+                Fully Customizable Questions
               </h4>
               <p className="opacity-70" style={{ color: '#0b4e9d' }}>
-                Connect stories to your family tree, preserving context and relationships for future generations.
+                Have full control over the direction adn tone for your deeply meaningful conversation
               </p>
             </div>
           </div>
@@ -535,7 +535,7 @@ export default function HomePage() {
                   Using our skills in storytelling and technology, we set out to build a service that preserves what truly matters: the voice, the personality, the life behind every memory.
                 </p>
                 <p className="text-white opacity-90 leading-relaxed mb-4">
-                  We believe no family story should disappear. Technology can takes us really far… but it takes humans, intention and care to preserve the soul of someone&apos;s life.
+                  We believe no family story should disappear. Technology can take us really far… but it takes humans, intention and care to preserve the soul of someone&apos;s life.
                 </p>
                 <p className="text-white opacity-90 leading-relaxed italic">
                   Dearly,<br />
