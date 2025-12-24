@@ -273,6 +273,204 @@ export function getInterviewReminderEmail(
   `
 }
 
+export function getEmailSignupConfirmationEmail() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+          }
+          .email-wrapper {
+            background-color: #f5f5f5;
+            padding: 40px 20px;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+          .logo-section {
+            padding: 40px 20px 20px;
+            text-align: center;
+          }
+          .logo {
+            max-width: 200px;
+            height: auto;
+          }
+          .content {
+            padding: 20px 40px 40px;
+            text-align: center;
+          }
+          .content p {
+            color: #333333;
+            margin: 15px 0;
+            font-size: 16px;
+          }
+          .button {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: #0b4e9d;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 30px 0;
+            font-weight: 600;
+            font-size: 16px;
+          }
+          .footer {
+            padding: 20px;
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-wrapper">
+          <div class="container">
+            <div class="logo-section">
+              <img src="${baseUrl}/dearly-logo.png" alt="Dearly" class="logo" />
+            </div>
+            <div class="content">
+              <p style="font-size: 24px; font-weight: 600; color: #0b4e9d;">Thank you for subscribing!</p>
+              <p>We'll keep you updated on Dearly's latest features and stories.</p>
+              <p style="font-size: 14px; color: #666666; margin-top: 30px;">
+                In the meantime, check out our website to learn more about preserving your family's stories.
+              </p>
+              <a href="${baseUrl}" class="button">Visit Dearly</a>
+            </div>
+            <div class="footer">
+              <p>Dearly - Preserve Your Stories</p>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+}
+
+export function getPaymentConfirmationEmail(name: string, packageName: string, intervieweeName: string, sessionId: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const bookingUrl = `${baseUrl}/booking/${sessionId}`
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+          }
+          .email-wrapper {
+            background-color: #f5f5f5;
+            padding: 40px 20px;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+          .logo-section {
+            padding: 40px 20px 20px;
+            text-align: center;
+          }
+          .logo {
+            max-width: 200px;
+            height: auto;
+          }
+          .content {
+            padding: 20px 40px 40px;
+            text-align: center;
+          }
+          .content p {
+            color: #333333;
+            margin: 15px 0;
+            font-size: 16px;
+          }
+          .info-box {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: left;
+          }
+          .info-box p {
+            margin: 8px 0;
+            font-size: 15px;
+          }
+          .button {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: #0b4e9d;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 30px 0;
+            font-weight: 600;
+            font-size: 16px;
+          }
+          .footer {
+            padding: 20px;
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-wrapper">
+          <div class="container">
+            <div class="logo-section">
+              <img src="${baseUrl}/dearly-logo.png" alt="Dearly" class="logo" />
+            </div>
+            <div class="content">
+              <p style="font-size: 24px; font-weight: 600; color: #0b4e9d;">Payment Confirmed!</p>
+              <p>Hi ${name},</p>
+              <p>Thank you for your purchase. Your payment has been successfully processed.</p>
+              <div class="info-box">
+                <p><strong>Package:</strong> Dearly ${packageName}</p>
+                <p><strong>Interviewee:</strong> ${intervieweeName}</p>
+              </div>
+              <p style="font-size: 15px; color: #666666;">
+                Next step: Schedule your interview by clicking the button below.
+              </p>
+              <a href="${bookingUrl}" class="button">Schedule Interview</a>
+              <p style="font-size: 13px; color: #999999; margin-top: 30px;">
+                Questions? Reply to this email and we'll be happy to help.
+              </p>
+            </div>
+            <div class="footer">
+              <p>Dearly - Preserve Your Stories</p>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+}
+
 export function getRecordingDeliveryEmail(name: string, listeningToken: string) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
   const listeningUrl = `${baseUrl}/listen/${listeningToken}`

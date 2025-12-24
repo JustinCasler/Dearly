@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { sendEmail, getPaymentConfirmationEmail } from '@/lib/resend'
 import Stripe from 'stripe'
 import crypto from 'crypto'
 
@@ -228,6 +229,25 @@ export async function POST(req: NextRequest) {
         })
 
       console.log('Appointment created successfully')
+    }
+
+    // Send payment confirmation email
+    const emailResult = await sendEmail({
+      to: customerEmail,
+      subject: 'Payment Confirmed - Dearly Interview',
+      html: getPaymentConfirmationEmail(
+        customerName,
+        packageName,
+        questionnaire.interviewee_name,
+        (sessionRecord as any).id
+      ),
+    })
+
+    if (!emailResult.success) {
+      console.error('Failed to send payment confirmation email:', emailResult.error)
+      // Don't fail the request if email fails - the payment was successful
+    } else {
+      console.log('Payment confirmation email sent to:', customerEmail)
     }
 
     // Payment successful - user will be redirected to booking page or confirmation

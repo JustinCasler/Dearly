@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { sendEmail, getEmailSignupConfirmationEmail } from '@/lib/resend'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,10 +23,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const cleanEmail = email.toLowerCase().trim()
+
     // Insert email into database
     const { data, error } = await (supabaseAdmin as any)
       .from('email_signups')
-      .insert([{ email: email.toLowerCase().trim() }])
+      .insert([{ email: cleanEmail }])
       .select()
       .single()
 
@@ -43,6 +46,18 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to save email' },
         { status: 500 }
       )
+    }
+
+    // Send confirmation email
+    const emailResult = await sendEmail({
+      to: cleanEmail,
+      subject: 'Welcome to Dearly!',
+      html: getEmailSignupConfirmationEmail(),
+    })
+
+    if (!emailResult.success) {
+      console.error('Failed to send confirmation email:', emailResult.error)
+      // Don't fail the request if email fails - the signup was successful
     }
 
     return NextResponse.json(
