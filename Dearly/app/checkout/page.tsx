@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { questionnaireSchema, QuestionnaireFormData } from '@/lib/validations'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { analytics } from '@/lib/analytics'
 
 const FORM_STORAGE_KEY = 'dearly_checkout_form'
 
@@ -65,6 +66,7 @@ function CheckoutPageContent() {
   const [generalError, setGeneralError] = useState<string | null>(null)
   const [selectedTheme, setSelectedTheme] = useState<string>('')
   const [currentStep, setCurrentStep] = useState(1)
+  const [checkoutStartTime] = useState(Date.now())
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -138,6 +140,19 @@ function CheckoutPageContent() {
         setValue('length_minutes', minutes)
       }
     }
+
+    // Track checkout initiation
+    const packageToPrice: { [key: number]: number } = {
+      30: 99,
+      60: 139,
+      90: 199,
+    }
+    const currentPackage = packageParam
+      ? (packageParam === 'essential' ? 30 : packageParam === 'gift' ? 60 : 90)
+      : 60 // default
+    const packageName = currentPackage === 30 ? 'essential' : currentPackage === 60 ? 'gift' : 'legacy'
+    const price = packageToPrice[currentPackage] || 139
+    analytics.startCheckout(packageName, price)
   }, [setValue, replace, searchParams])
 
   // Save form data to localStorage whenever it changes
@@ -168,6 +183,16 @@ function CheckoutPageContent() {
         { id: '3', text: '' },
       ])
     }
+
+    // Track theme selection
+    analytics.selectTheme(theme || 'custom')
+  }
+
+  const handleFieldBlur = (fieldName: string) => {
+    const value = watch(fieldName as any)
+    const isFilled = value !== undefined && value !== null && value !== ''
+    const timeOnPage = Date.now() - checkoutStartTime
+    analytics.trackFieldCompletion(fieldName, isFilled, 1, timeOnPage)
   }
 
   const lengthMinutes = watch('length_minutes')
@@ -233,6 +258,11 @@ function CheckoutPageContent() {
       return
     }
 
+    // Track step progression
+    const timeOnStep1 = Date.now() - checkoutStartTime
+    const packageName = lengthMinutes === 30 ? 'essential' : lengthMinutes === 60 ? 'gift' : 'legacy'
+    analytics.viewCheckoutStep(2, packageName, medium, timeOnStep1)
+
     setCurrentStep(2)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -292,6 +322,19 @@ function CheckoutPageContent() {
           notes: data.notes,
         },
       }
+
+      // Track checkout completion
+      const totalTime = Date.now() - checkoutStartTime
+      const packageName = data.length_minutes === 30 ? 'essential' : data.length_minutes === 60 ? 'gift' : 'legacy'
+      const packagePrice = data.length_minutes === 30 ? 99 : data.length_minutes === 60 ? 139 : 199
+      analytics.completeCheckout(
+        selectedTheme || 'custom',
+        data.questions.length,
+        packageName,
+        packagePrice,
+        data.medium,
+        totalTime
+      )
 
       console.log('Saving checkout data to localStorage:', checkoutData)
       localStorage.setItem('dearly_pending_checkout', JSON.stringify(checkoutData))
@@ -429,6 +472,7 @@ function CheckoutPageContent() {
                   <input
                     type="text"
                     {...register('name')}
+                    onBlur={() => handleFieldBlur('name')}
                     className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
                     style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                     placeholder="John Doe"
@@ -445,6 +489,7 @@ function CheckoutPageContent() {
                   <input
                     type="email"
                     {...register('email')}
+                    onBlur={() => handleFieldBlur('email')}
                     className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
                     style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                     placeholder="john@example.com"
@@ -468,6 +513,7 @@ function CheckoutPageContent() {
                   <input
                     type="text"
                     {...register('interviewee_name')}
+                    onBlur={() => handleFieldBlur('interviewee_name')}
                     className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
                     style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                     placeholder="e.g., Grandma Mary"
@@ -484,6 +530,7 @@ function CheckoutPageContent() {
                   <input
                     type="text"
                     {...register('relationship_to_interviewee')}
+                    onBlur={() => handleFieldBlur('relationship_to_interviewee')}
                     className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
                     style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                     placeholder="e.g., Granddaughter, Son, Friend"
@@ -499,6 +546,10 @@ function CheckoutPageContent() {
                   </label>
                   <select
                     {...register('length_minutes', { valueAsNumber: true })}
+                    onChange={(e) => {
+                      register('length_minutes', { valueAsNumber: true }).onChange(e)
+                      handleFieldBlur('length_minutes')
+                    }}
                     className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
                     style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                   >
@@ -517,6 +568,10 @@ function CheckoutPageContent() {
                   </label>
                   <select
                     {...register('medium')}
+                    onChange={(e) => {
+                      register('medium').onChange(e)
+                      handleFieldBlur('medium')
+                    }}
                     className="w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:border-opacity-100 transition"
                     style={{ borderColor: 'rgba(26, 0, 137, 0.2)', backgroundColor: '#FEFEFE' }}
                   >

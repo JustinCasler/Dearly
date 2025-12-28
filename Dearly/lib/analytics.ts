@@ -52,14 +52,6 @@ export const analytics = {
       value: price,
     }),
 
-  completeCheckout: (packageName: string, price: number) =>
-    trackEvent({
-      action: 'purchase',
-      category: 'conversion',
-      label: packageName,
-      value: price,
-    }),
-
   // Navigation
   clickNavLink: (destination: string) =>
     trackEvent({
@@ -83,5 +75,30 @@ export const analytics = {
       category: 'engagement',
       label: packageName,
       value: price,
+    }),
+
+  // Checkout Flow Tracking
+  trackFieldCompletion: (fieldName: string, isFilled: boolean, step: number, timeOnPage: number) =>
+    trackEvent({
+      action: 'checkout_field_completed',
+      category: 'checkout',
+      label: `${fieldName}_${isFilled ? 'filled' : 'empty'}_step${step}`,
+      value: Math.round(timeOnPage / 1000), // Convert to seconds
+    }),
+
+  viewCheckoutStep: (stepNumber: number, packageSelected: string, mediumSelected: string, timeOnStep: number) =>
+    trackEvent({
+      action: 'checkout_step_viewed',
+      category: 'checkout',
+      label: `step_${stepNumber}_${packageSelected}_${mediumSelected}`,
+      value: Math.round(timeOnStep / 1000), // Convert to seconds
+    }),
+
+  completeCheckout: (themeSelected: string, questionCount: number, packageName: string, packagePrice: number, medium: string, totalTime: number) =>
+    trackEvent({
+      action: 'checkout_completed',
+      category: 'checkout',
+      label: `${packageName}_${themeSelected}_${medium}_${questionCount}q`,
+      value: packagePrice,
     }),
 }
